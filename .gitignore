@@ -5,6 +5,11 @@
 /tmp
 /out-tsc
 /bazel-out
+/node_modules
+/src/app/node_modules
+/src/environments/node_modules
+.env
+.vscode
 
 # Node
 /node_modules
