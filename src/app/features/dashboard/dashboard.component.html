@@ -1,0 +1,91 @@
+<div class="bg-green-500">
+  <mat-sidenav-container class="h-screen">
+    <mat-sidenav
+      mode="side"
+      opened
+      class="p-4 w-64 text-white bg-green-700 border-r border-green-600 shadow-lg"
+    >
+      <div class="flex flex-col h-full">
+        <!-- En-tête du sidebar -->
+        <div class="pb-4 mb-8 border-b border-green-600">
+          <h2 class="text-xl font-bold text-green-800">{{ userName }} {{ user.prenom }}</h2>
+          <p class="text-sm text-green-500">{{ userRole }}</p>
+        </div>
+
+        <!-- Menu de navigation -->
+        <mat-nav-list class="space-y-2">
+          <!-- Routes pour Collecteur -->
+          <ng-container *ngIf="userRole === 'collecteur'">
+            <a
+              mat-list-item
+              routerLink="collecteur"
+              routerLinkActive="bg-green-600 rounded-lg"
+              class="rounded-lg transition-colors duration-200 hover:bg-green-600"
+            >
+              <mat-icon class="mr-3">dashboard</mat-icon>
+              Tableau de bord
+            </a>
+            <a
+              mat-list-item
+              routerLink="collectes"
+              routerLinkActive="bg-green-600 rounded-lg"
+              class="rounded-lg transition-colors duration-200 hover:bg-green-600"
+            >
+              <mat-icon class="mr-3">recycling</mat-icon>
+              Mes Collectes
+            </a>
+          </ng-container>
+
+          <!-- Routes pour Particulier -->
+          <ng-container *ngIf="userRole === 'particulier'">
+            <a
+              mat-list-item
+              routerLink="particulier"
+              routerLinkActive="bg-green-600 rounded-lg"
+              class="rounded-lg transition-colors duration-200 hover:bg-green-600"
+            >
+              <mat-icon class="mr-3">dashboard</mat-icon>
+              Tableau de bord
+            </a>
+            <a
+              mat-list-item
+              routerLink="demandes"
+              routerLinkActive="bg-green-600 rounded-lg"
+              class="rounded-lg transition-colors duration-200 hover:bg-green-600"
+            >
+              <mat-icon class="mr-3">list_alt</mat-icon>
+              Mes Demandes
+            </a>
+          </ng-container>
+
+          <!-- Routes communes -->
+          <a
+            mat-list-item
+            routerLink="profile"
+            routerLinkActive="bg-green-600 rounded-lg"
+            class="rounded-lg transition-colors duration-200 hover:bg-green-600"
+          >
+            <mat-icon class="mr-3">person</mat-icon>
+            Mon Profil
+          </a>
+        </mat-nav-list>
+
+        <!-- Bouton de déconnexion en bas -->
+        <div class="pt-4 mt-auto border-t border-green-600">
+          <button
+            (click)="onLogout()"
+            class="p-2 w-full text-black rounded-lg transition-colors duration-200 cursor-pointer hover:bg-green-600"
+          >
+            <mat-icon class="mr-3">exit_to_app</mat-icon>
+            Déconnexion
+          </button>
+        </div>
+      </div>
+    </mat-sidenav>
+
+    <mat-sidenav-content class="p-4">
+      <!-- Contenu principal -->
+      <router-outlet></router-outlet>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>
