@@ -22,6 +22,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import * as AuthActions from '../../../store/auth/auth.actions';
 import * as AuthSelectors from '../../../store/auth/auth.selectors';
+import { InitDataService } from '../../../service/init-data.service';
 
 @Component({
   selector: 'app-register',
@@ -110,6 +111,7 @@ export class RegisterComponent implements OnInit {
     private router: Router
   ) {
     this.registerForm = this.fb.group({
+      id: [InitDataService.getNextId()],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       nom: ['', [Validators.required, Validators.pattern(/^[a-zA-Z]{3,50}$/)]],
@@ -207,6 +209,7 @@ export class RegisterComponent implements OnInit {
   onSubmit() {
     if (this.registerForm.valid) {
       const formData: User = {
+        id: this.registerForm.value.id,
         ...this.registerForm.value,
         role: 'particulier',
         dateNaissance: new Date(this.registerForm.value.dateNaissance),

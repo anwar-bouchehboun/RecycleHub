@@ -6,9 +6,31 @@ import { User } from '../models/user.model';
 })
 export class InitDataService {
   private readonly USERS_KEY = 'users';
+  private static maxId = 0;
 
   constructor() {
+    this.initMaxId();
     this.initCollecteurs();
+  }
+
+  private initMaxId(): void {
+    const existingUsers = JSON.parse(
+      localStorage.getItem(this.USERS_KEY) || '[]'
+    );
+    if (existingUsers.length > 0) {
+      // Utiliser reduce pour trouver l'ID maximum
+      InitDataService.maxId = existingUsers.reduce(
+        (max: number, user: User) => {
+          const userId = user.id || 0;
+          return userId > max ? userId : max;
+        },
+        0
+      );
+    }
+  }
+
+  public static getNextId(): number {
+    return ++InitDataService.maxId;
   }
 
   private initCollecteurs(): void {
@@ -23,6 +45,7 @@ export class InitDataService {
 
     const collecteurs: User[] = [
       {
+        id: InitDataService.getNextId(), 
         email: 'safi@gmail.ma',
         password: 'Collecteur123!',
         nom: 'Collecteur',
@@ -36,6 +59,7 @@ export class InitDataService {
         dateNaissance: new Date('1990-01-01'),
       },
       {
+        id: InitDataService.getNextId(), // ID auto-incrémenté
         email: 'agadir@gmail.ma',
         password: 'Collecteur123!',
         nom: 'Collecteur',
@@ -49,6 +73,7 @@ export class InitDataService {
         dateNaissance: new Date('1992-02-02'),
       },
       {
+        id: InitDataService.getNextId(), // ID auto-incrémenté
         email: 'fes@gmail.ma',
         password: 'Collecteur123!',
         nom: 'Collecteur',
