@@ -31,7 +31,7 @@ export class AuthService {
 
     // Ne pas stocker l'utilisateur comme connecté
     return of({ success: true, user  });
-    
+
   }
 
   login(credentials: LoginCredentials): Observable<any> {
@@ -90,7 +90,7 @@ export class AuthService {
     localStorage.setItem(this.USERS_KEY, JSON.stringify(deletedUsers));
     localStorage.removeItem(this.CURRENT_USER_KEY);
     localStorage.removeItem('role');
-
+    //Supprimer  l'utilisateur de la LocalStorage
     return of({ success: true });
   }
 }
