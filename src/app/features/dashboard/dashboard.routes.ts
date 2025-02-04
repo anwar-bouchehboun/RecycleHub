@@ -29,7 +29,7 @@ export const DASHBOARD_ROUTES: Routes = [
       },
       {
         path: '',
-        redirectTo: 'collecteur',
+        redirectTo: 'particulier',
         pathMatch: 'full',
       },
 
