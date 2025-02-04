@@ -63,7 +63,7 @@ import * as AuthActions from '../../../store/auth/auth.actions';
               <input matInput formControlName="ville" />
             </mat-form-field>
 
-            <div class="flex justify-between mt-4">
+            <div class="flex gap-4 justify-between mt-4">
               <button
                 mat-raised-button
                 color="primary"

@@ -76,5 +76,23 @@ export const authReducer = createReducer(
     ...state,
     loading: false,
     error,
+  })),
+
+  // Delete Account
+  on(AuthActions.deleteAccount, (state) => ({
+    ...state,
+    loading: true,
+    error: null,
+  })),
+
+  on(AuthActions.deleteAccountSuccess, () => ({
+    ...initialState,
+    loading: false,
+  })),
+
+  on(AuthActions.deleteAccountFailure, (state, { error }) => ({
+    ...state,
+    error,
+    loading: false,
   }))
 );

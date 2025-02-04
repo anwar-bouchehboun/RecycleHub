@@ -1,15 +1,33 @@
 <div class="bg-green-500">
   <mat-sidenav-container class="h-screen">
     <mat-sidenav
-      mode="side"
-      opened
-      class="p-4 w-64 text-white bg-green-700 border-r border-green-600 shadow-lg"
+      #sidenav
+      [mode]="isMobile ? 'over' : 'side'"
+      [opened]="!isMobile"
+      class="p-4 w-64 text-white bg-green-700 border-r border-green-600 shadow-lg md:w-72"
     >
+      <!-- Bouton fermeture pour mobile -->
+      <button
+        *ngIf="isMobile"
+        (click)="sidenav.close()"
+        class="absolute top-2 right-2 text-white md:hidden"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+
       <div class="flex flex-col h-full">
         <!-- En-tête du sidebar -->
         <div class="pb-4 mb-8 border-b border-green-600">
-          <h2 class="text-xl font-bold text-green-800">{{ userName }} {{ user.prenom }}</h2>
-          <p class="text-sm text-green-500">{{ userRole }}</p>
+          <div class="flex gap-4 items-center">
+            <img [src]="imageUrl" alt="User Avatar"
+                 class="w-10 h-10 rounded-full md:w-12 md:h-12" />
+            <div class="flex flex-col">
+              <h5 class="text-lg font-bold text-green-800 md:text-xl">
+                {{ userName }} {{ user.prenom }}
+              </h5>
+              <p class="text-xs text-green-500 md:text-sm">{{ userRole }}</p>
+            </div>
+          </div>
         </div>
 
         <!-- Menu de navigation -->
@@ -84,7 +102,15 @@
     </mat-sidenav>
 
     <mat-sidenav-content class="p-4">
-      <!-- Contenu principal -->
+      <!-- Bouton menu pour mobile -->
+      <button
+        *ngIf="isMobile"
+        (click)="sidenav.open()"
+        class="p-2 mb-4 text-white bg-green-700 rounded-lg md:hidden"
+      >
+        <mat-icon>menu</mat-icon>
+      </button>
+
       <router-outlet></router-outlet>
     </mat-sidenav-content>
   </mat-sidenav-container>

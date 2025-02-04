@@ -9,6 +9,7 @@ import { Store } from '@ngrx/store';
 import { User } from '../../models/user.model';
 import { selectUser } from '../../store/auth/auth.selectors';
 import * as AuthActions from '../../store/auth/auth.actions';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-dashboard',
@@ -27,9 +28,21 @@ export class DashboardComponent implements OnInit {
   userName!: string;
   userRole!: string;
   user!: User;
+  imageUrl!: string;
+  isMobile = false;
+
   user$ = this.store.select(selectUser);
 
-  constructor(private store: Store) {}
+  constructor(
+    private store: Store,
+    private breakpointObserver: BreakpointObserver
+  ) {
+    this.breakpointObserver
+      .observe([Breakpoints.Handset])
+      .subscribe(result => {
+        this.isMobile = result.matches;
+      });
+  }
 
   ngOnInit() {
     this.user$.subscribe((user) => {
@@ -37,6 +50,7 @@ export class DashboardComponent implements OnInit {
         this.userName = user.nom;
         this.userRole = user.role;
         this.user = user;
+        this.imageUrl = user.photoUrl || 'assets/image.png';
       }
     });
   }

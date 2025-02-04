@@ -115,13 +115,12 @@ export class AuthEffects {
       ofType(AuthActions.deleteAccount),
       mergeMap(() =>
         this.authService.deleteAccount().pipe(
-          map(() => {
-            // Nettoyer le localStorage avant la redirection
+          mergeMap(() => {
+            // Nettoyer le localStorage
             localStorage.removeItem('currentUser');
             localStorage.removeItem('role');
-            // Forcer la redirection vers login
-            window.location.href = '/login';
-            return AuthActions.deleteAccountSuccess();
+            // Retourner les deux actions dans l'ordre
+            return [AuthActions.deleteAccountSuccess(), AuthActions.logout()];
           }),
           catchError((error) =>
             of(AuthActions.deleteAccountFailure({ error: error.message }))
@@ -129,6 +128,18 @@ export class AuthEffects {
         )
       )
     )
+  );
+
+  // Effet pour gérer la redirection après la suppression du compte
+  deleteAccountSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.deleteAccountSuccess),
+        tap(() => {
+          this.router.navigate(['/login']);
+        })
+      ),
+    { dispatch: false }
   );
 
   constructor(

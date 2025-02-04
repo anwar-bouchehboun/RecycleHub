@@ -34,7 +34,6 @@ export class InitDataService {
         },
         telephone: '0612345678',
         dateNaissance: new Date('1990-01-01'),
-        photoUrl: 'assets/default-avatar.png',
       },
       {
         email: 'agadir@gmail.ma',
@@ -48,7 +47,6 @@ export class InitDataService {
         },
         telephone: '0623456789',
         dateNaissance: new Date('1992-02-02'),
-        photoUrl: 'assets/default-avatar.png',
       },
       {
         email: 'fes@gmail.ma',
@@ -62,7 +60,6 @@ export class InitDataService {
         },
         telephone: '0634567890',
         dateNaissance: new Date('1991-03-03'),
-        photoUrl: 'assets/default-avatar.png',
       },
     ];
 
