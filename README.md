@@ -107,17 +107,4 @@ Ce projet est sous licence MIT.
 ## 📞 Contact   
 - [Anwar Bouchehboun](https://www.linkedin.com/in/anwar-bouchehboun/)
 
-## 📝 Remerciements 
-- [Angular](https://angular.io/)
-- [NgRx](https://ngrx.io/)
-- [RxJS](https://rxjs.dev/)
-- [Bootstrap](https://getbootstrap.com/)
-- [Material UI](https://mui.com/)
-- [Ngx Bootstrap](https://ngx-bootstrap.github.io/)
-- [Angular Material](https://material.angular.io/)
-- [Ngx Mat](https://ngx-mat.com/)
-- [Ngx Translate](https://ngx-translate.com/)
-- [Ngx Pagination](https://ngx-pagination.com/)
-- [Ngx Dropdown](https://ngx-dropdown.com/)
-- [Ngx Toastr](https://ngx-toastr.com/)
 
