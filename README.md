@@ -1,27 +1,88 @@
-# RecycleProjet
+# 🌱 RecycleHub
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.11.
+<p align="center">
+  <img src="assets/recycleHub-logo.png" alt="RecycleHub Logo" width="200"/>
+</p>
 
-## Development server
+## 📝 Description
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+RecycleHub est une application de gestion de recyclage qui connecte les particuliers avec des collecteurs agréés. Cette Single Page Application (SPA) vise à automatiser et simplifier le processus de recyclage.
 
-## Code scaffolding
+## ⚡ Technologies Utilisées
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+<p align="center">
+  <img src="https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular" />
+  <img src="https://img.shields.io/badge/NgRx-BA2BD2?style=for-the-badge&logo=redux&logoColor=white" alt="NgRx" />
+  <img src="https://img.shields.io/badge/RxJS-B7178C?style=for-the-badge&logo=reactivex&logoColor=white" alt="RxJS" />
+  <img src="https://img.shields.io/badge/Bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white" alt="Bootstrap" />
+  <img src="https://img.shields.io/badge/Material--UI-0081CB?style=for-the-badge&logo=material-ui&logoColor=white" alt="Material UI" />
+</p>
 
-## Build
+## 🚀 Fonctionnalités Principales
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+### 👤 Gestion des Utilisateurs
 
-## Running unit tests
+- Inscription et connexion des particuliers
+- Modification du profil
+- Gestion des comptes collecteurs
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### 📦 Gestion des Collectes
 
-## Running end-to-end tests
+- Soumission de demandes de collecte
+- Suivi en temps réel du statut
+- Support multi-déchets (plastique, verre, papier, métal)
+- Limite de 3 demandes simultanées
+- Maximum 10kg par collecte
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+### 💎 Système de Points
 
-## Further help
+| Type de Déchet | Points/kg |
+| -------------- | --------- |
+| Plastique      | 2 points  |
+| Verre          | 1 point   |
+| Papier         | 1 point   |
+| Métal          | 5 points  |
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+#### Conversion des Points
+
+- 100 points = Bon d'achat de 50 Dh
+- 200 points = Bon d'achat de 120 Dh
+- 500 points = Bon d'achat de 350 Dh
+
+## 🛠️ Installation
+
+```bash
+Cloner le projet
+git clone https://github.com/anwar-bouchehboun/RecycleHub.git
+Installer les dépendances
+npm install
+Lancer le serveur de développement
+ng serve
+```
+
+## 💻 Développement
+
+- Serveur de développement : `ng serve`
+- Construction du projet : `ng build`
+- Tests unitaires : `ng test`
+
+## 🔧 Architecture Technique
+
+- Angular 17+
+- Gestion d'état avec NgRx
+- RxJS/Observables
+- Injection de dépendance
+- Reactive Forms
+- Bootstrap/Tailwind
+- Angular Material UI
+- Guards et Resolvers
+- Routing avancé
+
+## 📱 Compatibilité
+
+- Design responsive
+- Compatible avec tous les navigateurs modernes
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou soumettre une pull request.
