@@ -3,7 +3,7 @@
 <p align="center">
    <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="p-4 w-full h-full text-green-600"
+            class="p-4 w-20 h-20 text-green-600"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -99,3 +99,25 @@ ng serve
 ## 🤝 Contribution
 
 Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou soumettre une pull request.
+
+## 📄 Licence
+
+Ce projet est sous licence MIT.
+
+## 📞 Contact   
+- [Anwar Bouchehboun](https://www.linkedin.com/in/anwar-bouchehboun/)
+
+## 📝 Remerciements 
+- [Angular](https://angular.io/)
+- [NgRx](https://ngrx.io/)
+- [RxJS](https://rxjs.dev/)
+- [Bootstrap](https://getbootstrap.com/)
+- [Material UI](https://mui.com/)
+- [Ngx Bootstrap](https://ngx-bootstrap.github.io/)
+- [Angular Material](https://material.angular.io/)
+- [Ngx Mat](https://ngx-mat.com/)
+- [Ngx Translate](https://ngx-translate.com/)
+- [Ngx Pagination](https://ngx-pagination.com/)
+- [Ngx Dropdown](https://ngx-dropdown.com/)
+- [Ngx Toastr](https://ngx-toastr.com/)
+
