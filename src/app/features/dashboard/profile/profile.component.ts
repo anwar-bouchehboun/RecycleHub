@@ -58,10 +58,17 @@ import * as AuthActions from '../../../store/auth/auth.actions';
               <input matInput formControlName="telephone" />
             </mat-form-field>
 
-            <mat-form-field>
-              <mat-label>Ville</mat-label>
-              <input matInput formControlName="ville" />
-            </mat-form-field>
+            <div formGroupName="adresse" class="flex flex-col gap-4">
+              <mat-form-field>
+                <mat-label>Rue</mat-label>
+                <input matInput formControlName="rue" />
+              </mat-form-field>
+
+              <mat-form-field>
+                <mat-label>Ville</mat-label>
+                <input matInput formControlName="ville" />
+              </mat-form-field>
+            </div>
 
             <div class="flex gap-4 justify-between mt-4">
               <button
@@ -97,7 +104,10 @@ export class ProfileComponent implements OnInit {
       prenom: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       telephone: ['', Validators.required],
-      ville: ['', Validators.required],
+      adresse: this.fb.group({
+        rue: ['', Validators.required],
+        ville: ['', Validators.required],
+      }),
     });
   }
 
@@ -109,7 +119,10 @@ export class ProfileComponent implements OnInit {
           prenom: user.prenom,
           email: user.email,
           telephone: user.telephone,
-          ville: user.adresse?.ville,
+          adresse: {
+            rue: user.adresse.rue,
+            ville: user.adresse.ville,
+          },
         });
       }
     });
@@ -119,13 +132,7 @@ export class ProfileComponent implements OnInit {
     if (this.profileForm.valid) {
       const updatedProfile = {
         ...this.profileForm.value,
-        adresse: {
-          ville: this.profileForm.value.ville,
-          rue: this.profileForm.get('rue')?.value || '',
-        },
       };
-
-      delete updatedProfile.ville;
 
       this.store.dispatch(
         AuthActions.updateProfile({ profile: updatedProfile })
