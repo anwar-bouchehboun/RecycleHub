@@ -25,14 +25,24 @@ export class DemandesEffects {
   createDemande$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DemandesActions.createDemande),
+      tap((action) => console.log('Création demande - Action reçue:', action)),
       mergeMap(({ demande }) =>
         this.demandeService.createDemande(demande).pipe(
-          map((newDemande) =>
-            DemandesActions.createDemandeSuccess({ demande: newDemande })
-          ),
-          catchError((error) =>
-            of(DemandesActions.createDemandeFailure({ error: error.message }))
-          )
+          tap((newDemande) => {
+            console.log('Création demande - Réponse du service:', newDemande);
+          }),
+          map((newDemande) => {
+            console.log('Création demande - Success action:', newDemande);
+            return DemandesActions.createDemandeSuccess({
+              demande: newDemande,
+            });
+          }),
+          catchError((error) => {
+            console.error('Création demande - Erreur:', error);
+            return of(
+              DemandesActions.createDemandeFailure({ error: error.message })
+            );
+          })
         )
       )
     )

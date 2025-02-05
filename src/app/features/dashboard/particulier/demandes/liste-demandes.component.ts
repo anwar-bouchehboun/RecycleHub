@@ -61,13 +61,13 @@ import * as DemandesSelectors from '../../../../store/demandes/demandes.selector
               <th mat-header-cell *matHeaderCellDef>Types de déchets</th>
               <td mat-cell *matCellDef="let demande">
                 <div class="flex gap-2">
-                    <div
-                      *ngFor="let type of demande.types"
-                      selected
-                      class="bg-green-500 text-white p-2 rounded-md"
-                    >
-                      {{ type.type }}
-                   </div>
+                  <div
+                    *ngFor="let type of demande.types"
+                    selected
+                    class="bg-green-500 text-white p-2 rounded-md"
+                  >
+                    {{ type.type }}
+                  </div>
                 </div>
               </td>
             </ng-container>
@@ -77,6 +77,34 @@ import * as DemandesSelectors from '../../../../store/demandes/demandes.selector
               <th mat-header-cell *matHeaderCellDef>Poids total</th>
               <td mat-cell *matCellDef="let demande">
                 {{ demande.poidsTotal / 1000 }} kg
+              </td>
+            </ng-container>
+
+            <!-- Photos Column -->
+            <ng-container matColumnDef="photos">
+              <th mat-header-cell *matHeaderCellDef>Photos</th>
+              <td mat-cell *matCellDef="let demande">
+                <div class="flex gap-2">
+                  <div
+                    *ngIf="demande.photos && demande.photos.length > 0"
+                    class="relative"
+                  >
+                    <img
+                      [src]="demande.photos[0]"
+                      class="w-12 h-12 object-cover rounded"
+                      (click)="openPhotosDialog(demande.photos)"
+                    />
+                    <span
+                      *ngIf="demande.photos.length > 1"
+                      class="absolute -top-2 -right-2 bg-primary-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                    >
+                      +{{ demande.photos.length - 1 }}
+                    </span>
+                  </div>
+                  <div *ngIf="!demande.photos?.length" class="text-gray-400">
+                    Aucune photo
+                  </div>
+                </div>
               </td>
             </ng-container>
 
@@ -120,9 +148,7 @@ import * as DemandesSelectors from '../../../../store/demandes/demandes.selector
       </mat-card>
     </div>
   `,
-  styles: [
-
-  ],
+  styles: [],
 })
 export class ListeDemandesComponent implements OnInit {
   demandes$ = this.store.select(DemandesSelectors.selectAllDemandes);
@@ -132,7 +158,7 @@ export class ListeDemandesComponent implements OnInit {
   loading$ = this.store.select(DemandesSelectors.selectDemandesLoading);
   error$ = this.store.select(DemandesSelectors.selectDemandesError);
 
-  displayedColumns = ['date', 'types', 'poids', 'statut', 'actions'];
+  displayedColumns = ['date', 'types', 'poids', 'photos', 'statut', 'actions'];
 
   constructor(private store: Store, private router: Router) {}
 
@@ -192,5 +218,9 @@ export class ListeDemandesComponent implements OnInit {
     if (confirm('Êtes-vous sûr de vouloir supprimer cette demande ?')) {
       this.store.dispatch(DemandesActions.deleteDemande({ id: demande.id }));
     }
+  }
+
+  openPhotosDialog(photos: string[]) {
+    console.log('Photos à afficher:', photos);
   }
 }

@@ -18,7 +18,7 @@ export const loadDemandesFailure = createAction(
 // Create Demande
 export const createDemande = createAction(
   '[Demandes] Create Demande',
-  props<{ demande: Omit<DemandeCollecte, 'id'> }>()
+  props<{ demande: Omit<DemandeCollecte, 'id'>; photos?: File[] }>()
 );
 export const createDemandeSuccess = createAction(
   '[Demandes] Create Demande Success',
@@ -32,7 +32,7 @@ export const createDemandeFailure = createAction(
 // Update Demande
 export const updateDemande = createAction(
   '[Demandes] Update Demande',
-  props<{ id: number; demande: Partial<DemandeCollecte> }>()
+  props<{ id: number; demande: Partial<DemandeCollecte>; photos?: File[] }>()
 );
 export const updateDemandeSuccess = createAction(
   '[Demandes] Update Demande Success',

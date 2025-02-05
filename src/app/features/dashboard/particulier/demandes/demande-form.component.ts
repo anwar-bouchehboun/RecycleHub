@@ -22,6 +22,8 @@ import { selectUser } from '../../../../store/auth/auth.selectors';
 import { DemandeCollecte } from '../../../../models/demande-collecte.model';
 import * as DemandesActions from '../../../../store/demandes/demandes.actions';
 import * as DemandesSelectors from '../../../../store/demandes/demandes.selectors';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-demande-form',
@@ -37,6 +39,7 @@ import * as DemandesSelectors from '../../../../store/demandes/demandes.selector
     MatButtonModule,
     MatIconModule,
     ReactiveFormsModule,
+    MatProgressBarModule,
   ],
   template: `
     <div class="container mx-auto p-4">
@@ -159,6 +162,70 @@ import * as DemandesSelectors from '../../../../store/demandes/demandes.selector
               <textarea matInput formControlName="notes" rows="3"></textarea>
             </mat-form-field>
 
+            <!-- Photos -->
+            <div class="space-y-2">
+              <h3 class="text-lg font-semibold">Photos (optionnel)</h3>
+              <div class="flex flex-col gap-4">
+                <div
+                  class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-primary-500"
+                  (click)="fileInput.click()"
+                  [class.border-primary-500]="isDragging"
+                  (dragover)="onDragOver($event)"
+                  (dragleave)="isDragging = false"
+                  (drop)="onDrop($event)"
+                >
+                  <input
+                    #fileInput
+                    type="file"
+                    class="hidden"
+                    accept="image/*"
+                    multiple
+                    (change)="onFileSelected($event)"
+                  />
+                  <mat-icon class="text-4xl text-gray-400"
+                    >cloud_upload</mat-icon
+                  >
+                  <p class="mt-2">
+                    Glissez vos photos ici ou cliquez pour sélectionner
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    Maximum 5 photos, 5MB chacune
+                  </p>
+                </div>
+
+                <!-- Preview des images -->
+                <div
+                  class="grid grid-cols-2 md:grid-cols-3 gap-4"
+                  *ngIf="selectedFiles.length"
+                >
+                  <div
+                    *ngFor="let file of selectedFiles; let i = index"
+                    class="relative"
+                  >
+                    <img
+                      [src]="previewUrls[i]"
+                      class="w-full h-32 object-cover rounded-lg"
+                      alt="Preview"
+                    />
+                    <button
+                      mat-icon-button
+                      color="warn"
+                      class="absolute top-1 right-1"
+                      (click)="removeFile(i)"
+                    >
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </div>
+                </div>
+
+                <mat-progress-bar
+                  *ngIf="uploadProgress > 0"
+                  [value]="uploadProgress"
+                  class="mt-2"
+                ></mat-progress-bar>
+              </div>
+            </div>
+
             <!-- Poids total -->
             <div class="text-right">
               <p class="font-semibold">
@@ -205,6 +272,10 @@ export class DemandeFormComponent implements OnInit {
   ];
   loading$ = this.store.select(DemandesSelectors.selectDemandesLoading);
   error$ = this.store.select(DemandesSelectors.selectDemandesError);
+  selectedFiles: File[] = [];
+  previewUrls: string[] = [];
+  isDragging = false;
+  uploadProgress = 0;
 
   get typesFormArray() {
     return this.demandeForm.get('types') as FormArray;
@@ -284,6 +355,7 @@ export class DemandeFormComponent implements OnInit {
                   ville: demande.adresse.ville,
                 },
                 notes: demande.notes,
+                photos: demande.photos,
               });
             }
           });
@@ -322,33 +394,103 @@ export class DemandeFormComponent implements OnInit {
     if (this.demandeForm.valid && this.getPoidsTotal() >= 1000) {
       this.store
         .select(selectUser)
+        .pipe(take(1))
         .subscribe((user) => {
           if (user) {
-            const demande = {
-              ...this.demandeForm.value,
-              userId: user.id,
-              poidsTotal: this.getPoidsTotal(),
-            };
+            const photosPromises = this.selectedFiles.map((file) =>
+              this.convertFileToBase64(file)
+            );
 
-            if (this.isEditMode && this.demandeId) {
-              this.store.dispatch(
-                DemandesActions.updateDemande({
-                  id: this.demandeId,
-                  demande,
-                })
-              );
-            } else {
-              this.store.dispatch(DemandesActions.createDemande({ demande }));
-            }
+            Promise.all(photosPromises).then((photoUrls) => {
+              const demande = {
+                ...this.demandeForm.value,
+                userId: user.id,
+                poidsTotal: this.getPoidsTotal(),
+                statut: 'en_attente',
+                dateCreation: new Date(),
+                photos: photoUrls,
+              };
 
-            this.router.navigate(['/dashboard/demandes']);
+              if (this.isEditMode && this.demandeId) {
+                this.store.dispatch(
+                  DemandesActions.updateDemande({
+                    id: this.demandeId,
+                    demande,
+                  })
+                );
+              } else {
+                this.store.dispatch(DemandesActions.createDemande({ demande }));
+              }
+              this.router.navigate(['/dashboard/demandes']);
+            });
           }
-        })
-        .unsubscribe();
+        });
     }
+  }
+
+  private convertFileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   }
 
   onCancel() {
     this.router.navigate(['/dashboard/demandes']);
+  }
+
+  onFileSelected(event: any) {
+    const files = event.target.files;
+    this.handleFiles(Array.from(files));
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = true;
+    return false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+
+    const files = event.dataTransfer?.files;
+    if (files) {
+      this.handleFiles(Array.from(files));
+    }
+    return false;
+  }
+
+  private async handleFiles(files: File[]) {
+    const validFiles = files.filter((file) => {
+      const isImage = file.type.startsWith('image/');
+      const isValidSize = file.size <= 5 * 1024 * 1024; // 5MB
+      return isImage && isValidSize;
+    });
+
+    if (this.selectedFiles.length + validFiles.length > 5) {
+      alert('Maximum 5 photos autorisées');
+      return;
+    }
+
+    for (const file of validFiles) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.previewUrls.push(e.target.result);
+      };
+      reader.readAsDataURL(file);
+      this.selectedFiles.push(file);
+    }
+  }
+
+  removeFile(index: number) {
+    if (index >= 0 && index < this.selectedFiles.length) {
+      this.selectedFiles = this.selectedFiles.filter((_, i) => i !== index);
+      this.previewUrls = this.previewUrls.filter((_, i) => i !== index);
+    }
   }
 }
