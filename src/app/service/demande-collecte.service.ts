@@ -34,6 +34,12 @@ export class DemandeCollecteService {
     const demandes = this.getAllDemandes().filter((d) => d.userId === userId);
     return of(demandes);
   }
+  getDemandesByVille(ville: string): Observable<DemandeCollecte[]> {
+    const demandes = this.getAllDemandes().filter(
+      (d) => d.adresse.ville === ville
+    );
+    return of(demandes);
+  }
 
   getDemandesEnAttente(userId: number): Observable<DemandeCollecte[]> {
     const demandes = this.getAllDemandes().filter(
@@ -93,6 +99,21 @@ export class DemandeCollecteService {
     }
 
     const demande = demandes[index];
+
+    // Si c'est une mise à jour de statut, on l'autorise
+    if (updates.statut) {
+      const updatedDemande = {
+        ...demande,
+        ...updates,
+        dateMiseAJour: new Date(),
+      };
+
+      demandes[index] = updatedDemande;
+      this.saveDemandes(demandes);
+      return of(updatedDemande);
+    }
+
+    // Pour les autres mises à jour, on vérifie le statut
     if (demande.statut !== 'en_attente') {
       return throwError(
         () => new Error('Seules les demandes en attente peuvent être modifiées')

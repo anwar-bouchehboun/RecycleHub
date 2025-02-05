@@ -62,3 +62,16 @@ export const updateVilleDemandes = createAction(
   '[Demandes] Update Ville Demandes',
   props<{ userId: number; ville: string }>()
 );
+
+export const loadDemandesByVille = createAction(
+  '[Demandes] Load Demandes By Ville',
+  props<{ ville: string }>()
+);
+export const loadDemandesByVilleSuccess = createAction(
+  '[Demandes] Load Demandes By Ville Success',
+  props<{ demandes: DemandeCollecte[] }>()
+);
+export const loadDemandesByVilleFailure = createAction(
+  '[Demandes] Load Demandes By Ville Failure',
+  props<{ error: string }>()
+);

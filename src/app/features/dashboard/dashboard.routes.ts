@@ -6,6 +6,8 @@ import { ProfileComponent } from './profile/profile.component';
 import { AuthGuard } from '../../guards/auth.guard';
 import { ListeDemandesComponent } from './particulier/demandes/liste-demandes.component';
 import { DemandeFormComponent } from './particulier/demandes/demande-form.component';
+import { CollectesComponent } from './collecteur/collectes/collectes.component';
+
 export const DASHBOARD_ROUTES: Routes = [
   {
     path: '',
@@ -28,6 +30,7 @@ export const DASHBOARD_ROUTES: Routes = [
         component: ProfileComponent,
         canActivate: [AuthGuard],
       },
+
       {
         path: 'demandes',
         canActivate: [AuthGuard],
@@ -46,6 +49,13 @@ export const DASHBOARD_ROUTES: Routes = [
             component: DemandeFormComponent,
           },
         ],
+      },
+
+      {
+        path: 'collectes',
+        component: CollectesComponent,
+        canActivate: [AuthGuard],
+        data: { role: 'collecteur' },
       },
       {
         path: '',

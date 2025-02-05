@@ -21,6 +21,19 @@ export class DemandesEffects {
       )
     )
   );
+  loadDemandesByVille$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DemandesActions.loadDemandesByVille),
+      mergeMap(({ ville }) =>
+        this.demandeService.getDemandesByVille(ville).pipe(
+          map((demandes) => DemandesActions.loadDemandesSuccess({ demandes })),
+          catchError((error) =>
+            of(DemandesActions.loadDemandesFailure({ error: error.message }))
+          )
+        )
+      )
+    )
+  );
 
   createDemande$ = createEffect(() =>
     this.actions$.pipe(

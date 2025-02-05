@@ -18,7 +18,6 @@ export const selectDemandesError = createSelector(
   selectDemandesState,
   (state) => state.error
 );
-
 export const selectDemandesByUser = (userId: number) =>
   createSelector(selectAllDemandes, (demandes) =>
     demandes.filter((d) => d.userId === userId)
@@ -27,4 +26,9 @@ export const selectDemandesByUser = (userId: number) =>
 export const selectDemandesEnAttenteByUser = (userId: number) =>
   createSelector(selectAllDemandes, (demandes) =>
     demandes.filter((d) => d.userId === userId && d.statut === 'en_attente')
+  );
+
+export const selectDemandesByVille = (ville: string) =>
+  createSelector(selectAllDemandes, (demandes) =>
+    demandes.filter((demande) => demande.adresse.ville === ville)
   );

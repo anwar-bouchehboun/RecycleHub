@@ -59,5 +59,15 @@ export const demandesReducer = createReducer(
         ? { ...d, adresse: { ...d.adresse, ville } }
         : d
     ),
-  }))
+  })),
+  on(DemandesActions.loadDemandesByVilleSuccess, (state, { demandes }) => ({
+    ...state,
+    demandes,
+  })),
+  on(DemandesActions.loadDemandesByVilleFailure, (state, { error }) => ({
+    ...state,
+    error,
+    loading: false,
+  })),
+  
 );

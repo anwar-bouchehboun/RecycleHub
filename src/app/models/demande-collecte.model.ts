@@ -16,7 +16,8 @@ export interface DemandeCollecte {
   dateCollecte: Date;
   creneauHoraire: string;
   notes?: string;
-  statut: 'en_attente' | 'validee' | 'rejetee' | 'terminee';
+  statut: 'en_attente' | 'occupee' | 'en_cours' | 'validee' | 'rejetee';
   dateCreation: Date;
   dateMiseAJour?: Date;
+  pointsAttribues?: number;
 }
