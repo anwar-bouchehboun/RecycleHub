@@ -31,81 +31,101 @@ import { selectUser } from '../../../store/auth/auth.selectors';
               <div class="p-4 sm:p-6 lg:p-8">
                 <div class="flex justify-between items-center mb-8">
                   <h1
-                    class="text-2xl font-bold tracking-tight md:text-3xl lg:text-4xl"
+                    class="text-2xl font-bold tracking-tight uppercase md:text-3xl lg:text-4xl"
                   >
                     Dashboard Collecteur
                   </h1>
                 </div>
 
-                <div class="grid grid-cols-1 gap-4 md:gap-6 md:grid-cols-3">
-                  <div
-                    class="p-4 rounded-xl backdrop-blur transition-transform duration-300 transform md:p-6 bg-white/10 hover:scale-105"
-                  >
-                    <div class="flex items-center space-x-4">
-                      <div class="p-2 rounded-lg md:p-3 bg-white/20">
-                        <mat-icon class="text-base text-white md:text-lg"
-                          >person</mat-icon
-                        >
-                      </div>
-                      <div>
-                        <p class="text-xs font-medium md:text-sm text-white/70">
-                          Nom Complet
-                        </p>
-                        <p class="text-sm font-semibold md:text-lg lg:text-xl">
-                          {{ (user$ | async)?.nom }}
-                          {{ (user$ | async)?.prenom }}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div
-                    class="p-4 rounded-xl backdrop-blur transition-transform duration-300 transform md:p-6 bg-white/10 hover:scale-105"
-                  >
-                    <div class="flex flex-col items-center space-x-4">
-                      <div class="flex items-center space-x-4">
-                        <div class="p-2 rounded-lg md:p-3 bg-white/20"  >
-                        <mat-icon class="text-base text-white md:text-lg"
-                          >email</mat-icon
-                        >
+                <!-- Section des statistiques -->
+                <div class="p-6">
+                  <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+                    <!-- Carte Info Personnelle -->
+                    <div
+                      class="overflow-hidden relative bg-green-500 rounded-2xl border border-gray-100 shadow-sm transition-all duration-300 group hover:shadow-xl"
+                    >
+                      <div
+                        class="absolute inset-0 bg-gradient-to-r from-green-50 to-emerald-50 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                      ></div>
+                      <div class="relative p-6">
+                        <div class="flex items-center space-x-4">
+                          <div
+                            class="p-3 bg-gradient-to-r from-green-100 to-emerald-100 rounded-xl transition-all duration-300 group-hover:from-green-200 group-hover:to-emerald-200"
+                          >
+                            <mat-icon class="text-green-600">person</mat-icon>
+                          </div>
+                          <div>
+                            <h3 class="mb-1 text-sm font-bold text-white uppercase">
+                              Nom Complet
+                            </h3>
+                            <p class="text-lg font-semibold text-gray-800">
+                              {{ (user$ | async)?.nom }}
+                              {{ (user$ | async)?.prenom }}
+                            </p>
+                          </div>
                         </div>
-                        <p class="text-xs font-medium md:text-sm text-white/70">
-                          Email
-                        </p>
                       </div>
-                     <div>
-                     <p class="text-sm font-semibold md:text-lg lg:text-xl">
-                        {{ (user$ | async)?.email }}
-                      </p>
-                     </div>
-
                     </div>
-                  </div>
 
-                  <div
-                    class="p-4 rounded-xl backdrop-blur transition-transform duration-300 transform md:p-6 bg-white/10 hover:scale-105"
-                  >
-                    <div class="flex items-center space-x-4">
-                      <div class="p-2 rounded-lg md:p-3 bg-white/20">
-                        <mat-icon class="text-base text-white md:text-lg"
-                          >location_on</mat-icon
-                        >
+                    <!-- Carte Email -->
+                    <div
+                      class="overflow-hidden relative bg-green-500 rounded-2xl border border-gray-100 shadow-sm transition-all duration-300 group hover:shadow-xl"
+                    >
+                      <div
+                        class="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                      ></div>
+                      <div class="relative p-6">
+                        <div class="flex items-center space-x-4">
+                          <div
+                            class="p-3 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-xl transition-all duration-300 group-hover:from-blue-200 group-hover:to-indigo-200"
+                          >
+                            <mat-icon class="text-blue-600">email</mat-icon>
+                          </div>
+                          <div>
+                            <h3 class="mb-1 text-sm font-bold text-white uppercase">
+                              Email
+                            </h3>
+                            <p
+                              class="text-lg font-semibold text-gray-800 break-all"
+                            >
+                              {{ (user$ | async)?.email }}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <p class="text-xs font-medium md:text-sm text-white/70">
-                          Zone
-                        </p>
-                        <p class="text-sm font-semibold md:text-lg lg:text-xl">
-                          {{ (user$ | async)?.adresse?.ville }}
-                        </p>
+                    </div>
+
+                    <!-- Carte Zone -->
+                    <div
+                      class="overflow-hidden relative bg-green-500 rounded-2xl border border-gray-100 shadow-sm transition-all duration-300 group hover:shadow-xl"
+                    >
+                      <div
+                        class="absolute inset-0 bg-gradient-to-r from-purple-50 to-pink-50 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                      ></div>
+                      <div class="relative p-6">
+                        <div class="flex items-center space-x-4">
+                          <div
+                            class="p-3 bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl transition-all duration-300 group-hover:from-purple-200 group-hover:to-pink-200"
+                          >
+                            <mat-icon class="text-purple-600"
+                              >location_on</mat-icon
+                            >
+                          </div>
+                          <div>
+                            <h3 class="mb-1 text-sm font-bold text-white uppercase">
+                              Zone
+                            </h3>
+                            <p class="text-lg font-semibold text-gray-800">
+                              {{ (user$ | async)?.adresse?.ville }}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            <!-- Section des statistiques -->
           </mat-card>
         </div>
       </div>
