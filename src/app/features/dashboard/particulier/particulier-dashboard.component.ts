@@ -1,57 +1,67 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
+import { RouterModule } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { Store } from '@ngrx/store';
 import { selectUser } from '../../../store/auth/auth.selectors';
+import * as PointsSelectors from '../../../store/points/points.selectors';
 
 @Component({
   selector: 'app-particulier-dashboard',
   standalone: true,
-  imports: [CommonModule, MatCardModule],
+  imports: [
+    CommonModule,
+    MatCardModule,
+    RouterModule,
+    MatButtonModule,
+    MatIconModule,
+  ],
   template: `
     <div class="container p-4 mx-auto">
-      <mat-card class="mb-4">
-        <mat-card-header>
-          <mat-card-title>
-            <h1 class="text-2xl font-bold">Dashboard Particulier</h1>
-          </mat-card-title>
-          <mat-card-subtitle>
-            <div class="flex flex-col gap-2">
-              <span
-                >Nom: {{ (user$ | async)?.nom }}
-                {{ (user$ | async)?.prenom }}</span
-              >
-              <span>Email: {{ (user$ | async)?.email }}</span>
-              <span>Téléphone: {{ (user$ | async)?.telephone }}</span>
-              <span>Ville: {{ (user$ | async)?.adresse?.ville }}</span>
-            </div>
-          </mat-card-subtitle>
-        </mat-card-header>
+      <div class="grid gap-4 md:grid-cols-2">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>Mes Demandes</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p class="mt-4">Gérez vos demandes de collecte</p>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-raised-button color="primary" routerLink="demandes">
+              <mat-icon>list</mat-icon>
+              Voir mes demandes
+            </button>
+          </mat-card-actions>
+        </mat-card>
 
-        <mat-card-content class="mt-4">
-          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div class="p-4 bg-green-50 rounded-lg">
-              <h2 class="mb-2 text-lg font-semibold">
-                Mes Points de Recyclage
-              </h2>
-              <!-- Contenu spécifique au particulier -->
-            </div>
-            <div class="p-4 bg-blue-50 rounded-lg">
-              <h2 class="mb-2 text-lg font-semibold">
-                Historique des Collectes
-              </h2>
-              <!-- Historique -->
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>Mes Points</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p class="mt-4">
+              Points disponibles: {{ pointsDisponibles$ | async }}
+            </p>
+            <p class="text-sm text-gray-600">
+              Convertissez vos points en bons d'achat
+            </p>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-raised-button color="primary" routerLink="points">
+              <mat-icon>swap_horiz</mat-icon>
+              Convertir mes points
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
     </div>
   `,
 })
-export class ParticulierDashboardComponent implements OnInit {
+export class ParticulierDashboardComponent {
   user$ = this.store.select(selectUser);
+  pointsDisponibles$ = this.store.select(PointsSelectors.selectPoints);
 
   constructor(private store: Store) {}
-
-  ngOnInit() {}
 }

@@ -19,6 +19,7 @@ import {
   BONS_ACHAT,
 } from '../../../../models/points.model';
 import { Observable, switchMap, tap } from 'rxjs';
+import * as PointsActions from '../../../../store/points/points.actions';
 
 class CalculateurPoints {
   private poidsReels: { [key: string]: number } = {};
@@ -31,17 +32,23 @@ class CalculateurPoints {
   calculerPointsAutomatique(demande: DemandeCollecte): void {
     if (!demande || !demande.types) return;
 
+    let totalPoints = 0;
     demande.types.forEach((type) => {
       const key = `${demande.id}-${type.type}`;
       this.poidsReels[key] = type.poids;
-      this.pointsCalcules[key] = type.poids * BAREME_POINTS[type.type];
-      console.log(
-        `Calcul pour ${type.type}: ${type.poids}kg x ${
-          BAREME_POINTS[type.type]
-        } pts/kg = ${this.pointsCalcules[key]} points`
-      );
+      // Conversion de grammes en kilogrammes pour le calcul des points
+      const poidsEnKg = type.poids / 1000;
+      const pointsPourType = poidsEnKg * BAREME_POINTS[type.type];
+      this.pointsCalcules[key] = pointsPourType;
+      totalPoints += pointsPourType;
+
+      console.log(`Calcul pour ${type.type}:
+        Poids: ${type.poids}g = ${poidsEnKg}kg
+        Barème: ${BAREME_POINTS[type.type]} pts/kg
+        Points: ${pointsPourType}`);
     });
-    this.updateTotalPoints(demande.id);
+
+    this.totalPoints[demande.id] = totalPoints;
     console.log(
       `Total points pour demande ${demande.id}: ${this.getTotalPoints(
         demande.id
@@ -52,19 +59,12 @@ class CalculateurPoints {
   // Obtenir les points calculés pour un type
   getPointsCalcules(demandeId: number, type: TypeDechet): number {
     const points = this.pointsCalcules[`${demandeId}-${type.type}`] || 0;
-    return points;
-  }
-
-  // Mettre à jour le total des points pour une demande
-  private updateTotalPoints(demandeId: number): void {
-    this.totalPoints[demandeId] = Object.entries(this.pointsCalcules)
-      .filter(([key]) => key.startsWith(`${demandeId}-`))
-      .reduce((total, [_, points]) => total + points, 0);
+    return Math.round(points);
   }
 
   // Obtenir le total des points pour une demande
   getTotalPoints(demandeId: number): number {
-    return this.totalPoints[demandeId] || 0;
+    return Math.round(this.totalPoints[demandeId] || 0);
   }
 
   // Obtenir les bons d'achat disponibles pour un nombre de points
@@ -77,6 +77,11 @@ class CalculateurPoints {
     this.poidsReels = {};
     this.pointsCalcules = {};
     this.totalPoints = {};
+  }
+
+  // Convertir grammes en kg pour l'affichage
+  formatPoidsEnKg(poids: number): string {
+    return (poids / 1000).toFixed(2);
   }
 }
 
@@ -101,7 +106,7 @@ class CalculateurPoints {
           <div class="grid gap-4 mt-4">
             <div
               *ngFor="let demande of demandes$ | async"
-              class="p-4 border rounded-lg shadow-sm"
+              class="p-4 rounded-lg border shadow-sm"
               [ngClass]="{
                 'bg-yellow-50': demande.statut === 'en_attente',
                 'bg-blue-50': demande.statut === 'en_cours',
@@ -114,7 +119,7 @@ class CalculateurPoints {
                   <h3 class="text-lg font-semibold">
                     Demande #{{ demande.id }}
                     <span
-                      class="ml-2 px-2 py-1 text-sm rounded-full"
+                      class="px-2 py-1 ml-2 text-sm rounded-full"
                       [ngClass]="{
                         'bg-yellow-200': demande.statut === 'en_attente',
                         'bg-blue-200': demande.statut === 'en_cours',
@@ -129,40 +134,30 @@ class CalculateurPoints {
                   <div class="ml-4 space-y-2">
                     <div
                       *ngFor="let type of demande.types"
-                      class="flex items-center gap-4"
+                      class="flex gap-4 items-center"
                     >
-                      <div class="flex items-center gap-2">
-                        <span>{{ type.type }} - {{ type.poids }}kg</span>
+                      <div class="flex gap-2 items-center">
                         <span
-                          class="text-blue-600 ml-2"
-                          *ngIf="demande.statut === 'en_cours'"
+                          >{{ type.type }} -
+                          {{ calculateur.formatPoidsEnKg(type.poids) }}kg</span
                         >
+                        <span class="ml-2 text-blue-600">
                           Points:
                           {{ calculateur.getPointsCalcules(demande.id, type) }}
                           ({{ BAREME_POINTS[type.type] }} pts/kg)
-                        </span>
-                        <span
-                          class="text-green-600"
-                          *ngIf="demande.statut === 'validee'"
-                        >
-                          Points gagnés:
-                          {{ calculateur.getPointsCalcules(demande.id, type) }}
                         </span>
                       </div>
                     </div>
                   </div>
                   <p class="mt-2">
                     <span class="font-medium">Poids total:</span>
-                    {{ demande.poidsTotal }}kg
+                    {{ calculateur.formatPoidsEnKg(demande.poidsTotal) }}kg
                   </p>
-                  <p
-                    *ngIf="demande.statut === 'en_cours'"
-                    class="mt-2 text-blue-600"
-                  >
+                  <p class="mt-2 text-blue-600">
                     <span class="font-medium">Total points:</span>
                     {{ calculateur.getTotalPoints(demande.id) }}
                   </p>
-                  <div *ngIf="demande.statut === 'en_cours'" class="mt-2">
+                  <div *ngIf="demande.statut !== 'rejetee'" class="mt-2">
                     <p class="font-medium text-gray-700">
                       Bons d'achat disponibles:
                     </p>
@@ -304,10 +299,20 @@ export class CollectesComponent implements OnInit {
       pointsAttribues: pointsTotal,
     };
 
+    // Mettre à jour la demande
     this.store.dispatch(
       DemandesActions.updateDemande({
         id: demande.id,
         demande: demandeModifiee,
+      })
+    );
+
+    // Ajouter les points à l'utilisateur
+    this.store.dispatch(
+      PointsActions.ajouterPoints({
+        userId: demande.userId,
+        points: pointsTotal,
+        demandeId: demande.id,
       })
     );
 
@@ -320,44 +325,27 @@ export class CollectesComponent implements OnInit {
             this.store.dispatch(
               DemandesActions.loadDemandesByVille({ ville: u.adresse.ville })
             );
-          }, 100); // Petit délai pour s'assurer que la mise à jour est terminée
+          }, 500);
         }
       })
       .unsubscribe();
   }
 
   rejeterCollecte(demande: DemandeCollecte) {
-    console.log('Rejet collecte:', demande.id);
     const raison = prompt('Veuillez indiquer la raison du rejet:');
     if (raison !== null) {
-      const demandeModifiee: Partial<DemandeCollecte> = {
-        statut: 'rejetee',
-        dateMiseAJour: new Date(),
-        notes: demande.notes
-          ? `${demande.notes}\nRejet: ${raison}`
-          : `Rejet: ${raison}`,
-      };
-
       this.store.dispatch(
         DemandesActions.updateDemande({
           id: demande.id,
-          demande: demandeModifiee,
+          demande: {
+            statut: 'rejetee',
+            dateMiseAJour: new Date(),
+            notes: demande.notes
+              ? `${demande.notes}\nRejet: ${raison}`
+              : `Rejet: ${raison}`,
+          },
         })
       );
-
-      // Recharger les demandes après la mise à jour
-      const user = this.store.select(selectUser);
-      user
-        .subscribe((u) => {
-          if (u?.adresse?.ville) {
-            setTimeout(() => {
-              this.store.dispatch(
-                DemandesActions.loadDemandesByVille({ ville: u.adresse.ville })
-              );
-            }, 100); // Petit délai pour s'assurer que la mise à jour est terminée
-          }
-        })
-        .unsubscribe();
     }
   }
 

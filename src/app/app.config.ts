@@ -9,6 +9,8 @@ import { authReducer } from './store/auth/auth.reducer';
 import { AuthEffects } from './store/auth/auth.effects';
 import { demandesReducer } from './store/demandes/demandes.reducer';
 import { DemandesEffects } from './store/demandes/demandes.effects';
+import { pointsReducer } from './store/points/points.reducer';
+import { PointsEffects } from './store/points/points.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -16,8 +18,9 @@ export const appConfig: ApplicationConfig = {
     provideStore({
       auth: authReducer,
       demandes: demandesReducer,
+      points: pointsReducer,
     }),
-    provideEffects([AuthEffects, DemandesEffects]),
+    provideEffects([AuthEffects, DemandesEffects, PointsEffects]),
     provideStoreDevtools(),
     provideAnimations(),
   ],

@@ -32,3 +32,12 @@ export const selectDemandesByVille = (ville: string) =>
   createSelector(selectAllDemandes, (demandes) =>
     demandes.filter((demande) => demande.adresse.ville === ville)
   );
+
+export const selectTotalPoints = createSelector(
+  selectDemandesState,
+  (state) => {
+    return state.demandes
+      .filter((demande) => demande.statut === 'validee')
+      .reduce((total, demande) => total + (demande.pointsAttribues || 0), 0);
+  }
+);

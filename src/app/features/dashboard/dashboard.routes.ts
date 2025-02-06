@@ -7,30 +7,68 @@ import { AuthGuard } from '../../guards/auth.guard';
 import { ListeDemandesComponent } from './particulier/demandes/liste-demandes.component';
 import { DemandeFormComponent } from './particulier/demandes/demande-form.component';
 import { CollectesComponent } from './collecteur/collectes/collectes.component';
+import { roleGuard } from '../../guards/role.guard';
 
 export const DASHBOARD_ROUTES: Routes = [
   {
     path: '',
     component: DashboardComponent,
+    canActivate: [AuthGuard],
     children: [
       {
         path: 'collecteur',
-        component: CollecteurDashboardComponent,
-        canActivate: [AuthGuard],
+        canActivate: [roleGuard],
         data: { role: 'collecteur' },
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./collecteur/collecteur-dashboard.component').then(
+                (m) => m.CollecteurDashboardComponent
+              ),
+          },
+          {
+            path: 'collectes',
+            loadComponent: () =>
+              import('./collecteur/collectes/collectes.component').then(
+                (m) => m.CollectesComponent
+              ),
+          },
+        ],
       },
       {
         path: 'particulier',
-        component: ParticulierDashboardComponent,
-        canActivate: [AuthGuard],
+        canActivate: [roleGuard],
         data: { role: 'particulier' },
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./particulier/particulier-dashboard.component').then(
+                (m) => m.ParticulierDashboardComponent
+              ),
+          },
+          {
+            path: 'demandes',
+            loadComponent: () =>
+              import('./particulier/demandes/liste-demandes.component').then(
+                (m) => m.ListeDemandesComponent
+              ),
+          },
+          {
+            path: 'points',
+            loadComponent: () =>
+              import('./particulier/points/conversion-points.component').then(
+                (m) => m.ConversionPointsComponent
+              ),
+          },
+        ],
       },
       {
         path: 'profile',
-        component: ProfileComponent,
-        canActivate: [AuthGuard],
+        loadComponent: () =>
+          import('./profile/profile.component').then((m) => m.ProfileComponent),
       },
-
       {
         path: 'demandes',
         canActivate: [AuthGuard],
@@ -50,7 +88,6 @@ export const DASHBOARD_ROUTES: Routes = [
           },
         ],
       },
-
       {
         path: 'collectes',
         component: CollectesComponent,

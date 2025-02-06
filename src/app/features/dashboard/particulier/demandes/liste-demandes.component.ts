@@ -11,7 +11,7 @@ import { selectUser } from '../../../../store/auth/auth.selectors';
 import { Router } from '@angular/router';
 import * as DemandesActions from '../../../../store/demandes/demandes.actions';
 import * as DemandesSelectors from '../../../../store/demandes/demandes.selectors';
-
+import { BAREME_POINTS } from '../../../../models/points.model';
 @Component({
   selector: 'app-liste-demandes',
   standalone: true,
@@ -24,7 +24,7 @@ import * as DemandesSelectors from '../../../../store/demandes/demandes.selector
     MatChipsModule,
   ],
   template: `
-    <div class="container mx-auto p-4">
+    <div class="container p-4 mx-auto">
       <mat-card>
         <mat-card-header>
           <mat-card-title>Mes demandes de collecte</mat-card-title>
@@ -64,7 +64,7 @@ import * as DemandesSelectors from '../../../../store/demandes/demandes.selector
                   <div
                     *ngFor="let type of demande.types"
                     selected
-                    class="bg-green-500 text-white p-2 rounded-md"
+                    class="p-2 text-white bg-green-500 rounded-md"
                   >
                     {{ type.type }}
                   </div>
@@ -91,12 +91,12 @@ import * as DemandesSelectors from '../../../../store/demandes/demandes.selector
                   >
                     <img
                       [src]="demande.photos[0]"
-                      class="w-12 h-12 object-cover rounded"
+                      class="object-cover w-12 h-12 rounded"
                       (click)="openPhotosDialog(demande.photos)"
                     />
                     <span
                       *ngIf="demande.photos.length > 1"
-                      class="absolute -top-2 -right-2 bg-primary-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                      class="flex absolute -top-2 -right-2 justify-center items-center w-5 h-5 text-xs text-white rounded-full bg-primary-500"
                     >
                       +{{ demande.photos.length - 1 }}
                     </span>
@@ -114,6 +114,28 @@ import * as DemandesSelectors from '../../../../store/demandes/demandes.selector
               <td mat-cell *matCellDef="let demande">
                 <span [class]="getStatutClass(demande.statut)">
                   {{ getStatutLabel(demande.statut) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Points Column -->
+            <ng-container matColumnDef="points">
+              <th mat-header-cell *matHeaderCellDef>Points</th>
+              <td mat-cell *matCellDef="let demande">
+                <span
+                  *ngIf="demande.statut === 'validee'"
+                  class="font-bold text-green-600"
+                >
+                  {{
+                    demande.pointsAttribues || calculerPoints(demande)
+                  }}
+                  points
+                </span>
+                <span
+                  *ngIf="demande.statut !== 'validee'"
+                  class="text-red-600"
+                >
+                  ######
                 </span>
               </td>
             </ng-container>
@@ -158,7 +180,15 @@ export class ListeDemandesComponent implements OnInit {
   loading$ = this.store.select(DemandesSelectors.selectDemandesLoading);
   error$ = this.store.select(DemandesSelectors.selectDemandesError);
 
-  displayedColumns = ['date', 'types', 'poids', 'photos', 'statut', 'actions'];
+  displayedColumns = [
+    'date',
+    'types',
+    'poids',
+    'photos',
+    'statut',
+    'points',
+    'actions',
+  ];
 
   constructor(private store: Store, private router: Router) {}
 
@@ -222,5 +252,17 @@ export class ListeDemandesComponent implements OnInit {
 
   openPhotosDialog(photos: string[]) {
     console.log('Photos à afficher:', photos);
+  }
+
+  calculerPoints(demande: DemandeCollecte): number {
+    return demande.types.reduce((total, type) => {
+      const typeDechet = type.type.toLowerCase() as keyof typeof BAREME_POINTS;
+      const pointsParKg = BAREME_POINTS[typeDechet];
+      const points = type.poids * pointsParKg;
+      console.log(points);
+      console.log(total+points);
+
+      return total + points;
+    }, 0);
   }
 }
