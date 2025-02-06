@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import {
   Observable,
@@ -19,6 +20,8 @@ import {
   BONS_ACHAT,
   BonAchat,
   HistoriquePoints,
+  PointsRecyclage,
+  Coupon,
 } from '../../../../models/points.model';
 import { selectUser } from '../../../../store/auth/auth.selectors';
 import * as PointsActions from '../../../../store/points/points.actions';
@@ -39,7 +42,13 @@ interface BonAchatDisponible extends BonAchat {
 @Component({
   selector: 'app-conversion-points',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule],
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatSnackBarModule,
+  ],
   template: `
     <div class="container p-4 mx-auto">
       <mat-card class="mb-4">
@@ -60,7 +69,7 @@ interface BonAchatDisponible extends BonAchat {
                 <div>
                   <p class="text-gray-600">Points disponibles:</p>
                   <p class="text-2xl font-bold">
-                    {{ pointsDisponibles$ | async }}
+                    {{ userPoints }}
                   </p>
                 </div>
               </div>
@@ -96,7 +105,44 @@ interface BonAchatDisponible extends BonAchat {
                 </div>
               </div>
             </div>
-<!--
+
+            <!-- <div class="mt-4" *ngIf="coupons$ | async as coupons">
+              <h3 class="mb-2 text-lg font-semibold">Mes Coupons</h3>
+              <div class="grid gap-4 md:grid-cols-2">
+                <div
+                  *ngFor="let coupon of coupons"
+                  class="p-4 rounded-lg border"
+                  [class.opacity-50]="coupon.estUtilise || isExpired(coupon)"
+                >
+                  <div class="flex justify-between items-center">
+                    <div>
+                      <p class="text-xl font-bold">{{ coupon.valeur }} Dh</p>
+                      <p class="text-sm text-gray-600">
+                        Code: {{ coupon.code }}
+                      </p>
+                      <p class="text-xs text-gray-500">
+                        Expire le:
+                        {{ coupon.dateExpiration | date : 'dd/MM/yyyy' }}
+                      </p>
+                    </div>
+                    <div class="text-right">
+                      <span
+                        class="px-2 py-1 text-xs rounded"
+                        [class.bg-green-100.text-green-800]="
+                          !coupon.estUtilise && !isExpired(coupon)
+                        "
+                        [class.bg-red-100.text-red-800]="
+                          coupon.estUtilise || isExpired(coupon)
+                        "
+                      >
+                        {{ getStatus(coupon) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div> -->
+
             <div
               class="mt-4"
               *ngIf="historiqueConversions$ | async as historique"
@@ -129,7 +175,7 @@ interface BonAchatDisponible extends BonAchat {
                   </div>
                 </div>
               </div>
-            </div> -->
+            </div>
           </div>
         </mat-card-content>
       </mat-card>
@@ -146,8 +192,12 @@ export class ConversionPointsComponent implements OnInit, OnDestroy {
   totalPointsGagnes$: Observable<number>;
   pointsConvertis$: Observable<number>;
   bonsDisponibles$: Observable<BonAchatDisponible[]>;
+  pointsRestants$: Observable<number> = of(0);
+  pointsByUserId$: Observable<PointsRecyclage> = of({} as PointsRecyclage);
+  userPoints: number = 0;
+  coupons$: Observable<Coupon[]>;
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private snackBar: MatSnackBar) {
     // Demandes validées
     this.demandesValidees$ = this.store
       .select(DemandesSelectors.selectAllDemandes)
@@ -209,6 +259,15 @@ export class ConversionPointsComponent implements OnInit, OnDestroy {
         }))
       )
     );
+
+    this.coupons$ = this.pointsByUserId$.pipe(
+      map((points) => points.coupons || []),
+      map((coupons) =>
+        coupons.sort(
+          (a, b) => b.dateCreation.getTime() - a.dateCreation.getTime()
+        )
+      )
+    );
   }
 
   ngOnInit() {
@@ -229,9 +288,20 @@ export class ConversionPointsComponent implements OnInit, OnDestroy {
           this.store.dispatch(
             DemandesActions.loadDemandes({ userId: user.id })
           );
+          this.pointsByUserId$ = this.store.select(
+            PointsSelectors.selectPointsByUserId
+          );
         })
       )
       .subscribe();
+
+    this.pointsByUserId$.subscribe((points) => {
+      console.log('Points par utilisateur: xxxx :  ', points.points);
+    });
+    this.pointsByUserId$.subscribe((points) => {
+      this.userPoints = points.points;
+      console.log('Points par utilisateur:', this.userPoints);
+    });
   }
 
   ngOnDestroy() {
@@ -240,97 +310,45 @@ export class ConversionPointsComponent implements OnInit, OnDestroy {
   }
 
   convertirPoints(bon: BonAchat) {
-    this.pointsDisponibles$
-      .pipe(take(1), takeUntil(this.destroy$))
-      .subscribe((pointsDisponibles) => {
-        if (pointsDisponibles < bon.points) {
-          alert('Points insuffisants pour cette conversion');
-          return;
-        }
+    this.store
+      .select(selectUser)
+      .pipe(
+        takeUntil(this.destroy$),
+        map((user) => user as User | null),
+        filter(
+          (user): user is UserWithId =>
+            user !== null && typeof user.id === 'number'
+        ),
+        take(1)
+      )
+      .subscribe((user) => {
+        this.store.dispatch(
+          PointsActions.convertirPoints({
+            userId: user.id,
+            points: bon.points,
+            valeur: bon.valeur,
+          })
+        );
 
-        if (
-          confirm(
-            `Voulez-vous convertir ${bon.points} points en bon d'achat de ${bon.valeur} Dh ?`
-          )
-        ) {
-          this.store
-            .select(selectUser)
-            .pipe(
-              takeUntil(this.destroy$),
-              map((user) => user as User | null),
-              filter(
-                (user): user is UserWithId =>
-                  user !== null && typeof user.id === 'number'
-              ),
-              take(1),
-              tap((user) => {
-                this.store.dispatch(
-                  PointsActions.convertirPoints({
-                    userId: user.id,
-                    points: bon.points,
-                    valeur: bon.valeur,
-                  })
-                );
-              })
-            )
-            .subscribe();
-        }
+        this.snackBar.open(
+          'Conversion réussie ! Votre coupon a été généré.',
+          'Fermer',
+          {
+            duration: 5000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          }
+        );
       });
   }
 
-  // convertirTousLesPoints() {
-  //   this.pointsDisponibles$
-  //     .pipe(take(1), takeUntil(this.destroy$))
-  //     .subscribe((pointsDisponibles) => {
-  //       if (pointsDisponibles === 0) {
-  //         alert("Vous n'avez pas de points à convertir");
-  //         return;
-  //       }
+  isExpired(coupon: Coupon): boolean {
+    return new Date() > new Date(coupon.dateExpiration);
+  }
 
-  //       // Trouver le meilleur bon d'achat disponible
-  //       const bonsDisponibles = this.bonsAchat
-  //         .filter((bon) => pointsDisponibles >= bon.points)
-  //         .sort((a, b) => b.points - a.points);
-
-  //       if (bonsDisponibles.length === 0) {
-  //         alert(
-  //           "Vous n'avez pas assez de points pour le plus petit bon d'achat"
-  //         );
-  //         return;
-  //       }
-
-  //       const meilleurBon = bonsDisponibles[0];
-  //       const nombreBons = Math.floor(pointsDisponibles / meilleurBon.points);
-  //       const pointsUtilises = nombreBons * meilleurBon.points;
-  //       const valeurTotale = nombreBons * meilleurBon.valeur;
-
-  //       if (
-  //         confirm(
-  //           `Voulez-vous convertir ${pointsUtilises} points en ${nombreBons} bon(s) d'achat pour un total de ${valeurTotale} Dh ?`
-  //         )
-  //       ) {
-  //         this.store
-  //           .select(selectUser)
-  //           .pipe(
-  //             takeUntil(this.destroy$),
-  //             map((user) => user as User | null),
-  //             filter(
-  //               (user): user is UserWithId =>
-  //                 user !== null && typeof user.id === 'number'
-  //             ),
-  //             take(1),
-  //             tap((user) => {
-  //               this.store.dispatch(
-  //                 PointsActions.convertirPoints({
-  //                   userId: user.id,
-  //                   points: pointsUtilises,
-  //                   valeur: valeurTotale,
-  //                 })
-  //               );
-  //             })
-  //           )
-  //           .subscribe();
-  //       }
-  //     });
-  // }
+  getStatus(coupon: Coupon): string {
+    if (coupon.estUtilise) return 'Utilisé';
+    if (this.isExpired(coupon)) return 'Expiré';
+    return 'Valide';
+  }
 }

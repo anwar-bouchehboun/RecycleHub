@@ -3,6 +3,7 @@ export interface PointsRecyclage {
   userId: number;
   points: number;
   historique: HistoriquePoints[];
+  coupons: Coupon[];
 }
 
 export interface HistoriquePoints {
@@ -16,6 +17,16 @@ export interface HistoriquePoints {
 export interface BonAchat {
   points: number;
   valeur: number;
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  valeur: number;
+  dateCreation: Date;
+  dateExpiration: Date;
+  estUtilise: boolean;
+  userId: number;
 }
 
 export const BAREME_POINTS = {

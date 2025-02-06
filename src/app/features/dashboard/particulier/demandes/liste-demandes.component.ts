@@ -126,15 +126,10 @@ import { BAREME_POINTS } from '../../../../models/points.model';
                   *ngIf="demande.statut === 'validee'"
                   class="font-bold text-green-600"
                 >
-                  {{
-                    demande.pointsAttribues || calculerPoints(demande)
-                  }}
+                  {{ demande.pointsAttribues || calculerPoints(demande) }}
                   points
                 </span>
-                <span
-                  *ngIf="demande.statut !== 'validee'"
-                  class="text-red-600"
-                >
+                <span *ngIf="demande.statut !== 'validee'" class="text-red-600">
                   ######
                 </span>
               </td>
@@ -260,7 +255,7 @@ export class ListeDemandesComponent implements OnInit {
       const pointsParKg = BAREME_POINTS[typeDechet];
       const points = type.poids * pointsParKg;
       console.log(points);
-      console.log(total+points);
+      console.log(total + points);
 
       return total + points;
     }, 0);

@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
-import { HistoriquePoints, PointsRecyclage } from '../models/points.model';
+import {
+  HistoriquePoints,
+  PointsRecyclage,
+  Coupon,
+} from '../models/points.model';
 
 @Injectable({
   providedIn: 'root',
@@ -44,6 +48,32 @@ export class PointsService {
     return pointsGagnes - pointsConvertis;
   }
 
+  private generateCouponCode(): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const codeLength = 8;
+    let code = '';
+    for (let i = 0; i < codeLength; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  }
+
+  private generateCoupon(userId: number, valeur: number): Coupon {
+    const dateCreation = new Date();
+    const dateExpiration = new Date();
+    dateExpiration.setMonth(dateExpiration.getMonth() + 3); // Validité de 3 mois
+
+    return {
+      id: crypto.randomUUID(),
+      code: this.generateCouponCode(),
+      valeur,
+      dateCreation,
+      dateExpiration,
+      estUtilise: false,
+      userId,
+    };
+  }
+
   private initializeUserPoints(userId: number): PointsRecyclage {
     // Récupérer toutes les demandes validées de l'utilisateur
     const demandes = this.getAllDemandes().filter(
@@ -64,6 +94,7 @@ export class PointsService {
       userId,
       points: historique.reduce((total, h) => total + h.points, 0),
       historique,
+      coupons: [],
     };
   }
 
@@ -106,7 +137,11 @@ export class PointsService {
     userId: number,
     points: number,
     valeur: number
-  ): Observable<{ pointsRestants: number; conversion: HistoriquePoints }> {
+  ): Observable<{
+    pointsRestants: number;
+    conversion: HistoriquePoints;
+    coupon: Coupon;
+  }> {
     console.log(`Conversion de ${points} points pour user:`, userId);
     const allPoints = this.getAllPoints();
     const userPoints = allPoints.find((p) => p.userId === userId);
@@ -125,12 +160,19 @@ export class PointsService {
       return throwError(() => new Error('Points insuffisants'));
     }
 
+    // Générer le coupon
+    const coupon = this.generateCoupon(userId, valeur);
+    if (!userPoints.coupons) {
+      userPoints.coupons = [];
+    }
+    userPoints.coupons.push(coupon);
+
     const conversion: HistoriquePoints = {
       id: Date.now(),
       date: new Date(),
       points: points,
       type: 'conversion',
-      details: `Conversion en bon d'achat de ${valeur} Dh`,
+      details: `Conversion en bon d'achat de ${valeur} Dh (Code: ${coupon.code})`,
     };
 
     userPoints.historique.unshift(conversion);
@@ -141,6 +183,7 @@ export class PointsService {
     return of({
       pointsRestants: userPoints.points,
       conversion,
+      coupon,
     });
   }
 
@@ -189,5 +232,18 @@ export class PointsService {
       pointsTotal: userPoints.points,
       historique,
     });
+  }
+
+  getPointsByUserId(userId: number): Observable<PointsRecyclage> {
+    const allPoints = this.getAllPoints();
+    const userPoints = allPoints.find((p) => p.userId === userId);
+
+    if (!userPoints) {
+      // Créer un nouvel objet PointsRecyclage si aucun n'existe
+      const newPoints = this.initializeUserPoints(userId);
+      return of(newPoints);
+    }
+
+    return of(userPoints);
   }
 }

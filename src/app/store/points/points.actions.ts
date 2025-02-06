@@ -1,5 +1,9 @@
 import { createAction, props } from '@ngrx/store';
-import { HistoriquePoints } from '../../models/points.model';
+import {
+  HistoriquePoints,
+  PointsRecyclage,
+  Coupon,
+} from '../../models/points.model';
 
 // Charger les points
 export const loadPoints = createAction(
@@ -28,6 +32,7 @@ export const convertirPointsSuccess = createAction(
   props<{
     pointsRestants: number;
     conversion: HistoriquePoints;
+    coupon: Coupon;
   }>()
 );
 
@@ -56,5 +61,20 @@ export const ajouterPointsSuccess = createAction(
 
 export const ajouterPointsFailure = createAction(
   '[Points] Ajouter Points Failure',
+  props<{ error: string }>()
+);
+
+export const loadPointsByUserId = createAction(
+  '[Points] Load Points By User Id',
+  props<{ userId: number }>()
+);
+
+export const loadPointsByUserIdSuccess = createAction(
+  '[Points] Load Points By User Id Success',
+  props<{ points: PointsRecyclage }>()
+);
+
+export const loadPointsByUserIdFailure = createAction(
+  '[Points] Load Points By User Id Failure',
   props<{ error: string }>()
 );

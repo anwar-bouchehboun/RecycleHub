@@ -1,5 +1,7 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { PointsState } from './points.reducer';
+import { PointsRecyclage } from '../../models/points.model';
+import { selectUser } from '../auth/auth.selectors';
 
 export const selectPointsState = createFeatureSelector<PointsState>('points');
 
@@ -28,4 +30,16 @@ export const selectPointsLoading = createSelector(
 export const selectPointsError = createSelector(
   selectPointsState,
   (state) => state.error
+);
+
+export const selectPointsByUserId = createSelector(
+  selectPointsState,
+  selectUser,
+  (state, user): PointsRecyclage => ({
+    id: Date.now(),
+    userId: user?.id || 0,
+    points: state.points,
+    historique: state.historique,
+    coupons: state.coupons,
+  })
 );

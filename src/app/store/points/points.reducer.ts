@@ -1,10 +1,11 @@
 import { createReducer, on } from '@ngrx/store';
-import { HistoriquePoints } from '../../models/points.model';
+import { HistoriquePoints, Coupon } from '../../models/points.model';
 import * as PointsActions from './points.actions';
 
 export interface PointsState {
   points: number;
   historique: HistoriquePoints[];
+  coupons: Coupon[];
   loading: boolean;
   error: string | null;
 }
@@ -12,6 +13,7 @@ export interface PointsState {
 export const initialState: PointsState = {
   points: 0,
   historique: [],
+  coupons: [],
   loading: false,
   error: null,
 };
@@ -47,10 +49,11 @@ export const pointsReducer = createReducer(
 
   on(
     PointsActions.convertirPointsSuccess,
-    (state, { pointsRestants, conversion }) => ({
+    (state, { pointsRestants, conversion, coupon }) => ({
       ...state,
       points: pointsRestants,
       historique: [conversion, ...state.historique],
+      coupons: [coupon, ...state.coupons],
       loading: false,
       error: null,
     })
@@ -80,6 +83,21 @@ export const pointsReducer = createReducer(
   ),
 
   on(PointsActions.ajouterPointsFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error,
+  })),
+
+  on(PointsActions.loadPointsByUserIdSuccess, (state, { points }) => ({
+    ...state,
+    points: points.points,
+    historique: points.historique,
+    coupons: points.coupons || [],
+    loading: false,
+    error: null,
+  })),
+
+  on(PointsActions.loadPointsByUserIdFailure, (state, { error }) => ({
     ...state,
     loading: false,
     error,

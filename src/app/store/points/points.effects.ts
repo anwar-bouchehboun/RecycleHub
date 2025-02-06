@@ -30,8 +30,12 @@ export class PointsEffects {
       ofType(PointsActions.convertirPoints),
       mergeMap(({ userId, points, valeur }) =>
         this.pointsService.convertirPoints(userId, points, valeur).pipe(
-          map(({ pointsRestants, conversion }) =>
-            PointsActions.convertirPointsSuccess({ pointsRestants, conversion })
+          map(({ pointsRestants, conversion, coupon }) =>
+            PointsActions.convertirPointsSuccess({
+              pointsRestants,
+              conversion,
+              coupon,
+            })
           ),
           catchError((error) =>
             of(PointsActions.convertirPointsFailure({ error: error.message }))
@@ -51,6 +55,21 @@ export class PointsEffects {
           ),
           catchError((error) =>
             of(PointsActions.ajouterPointsFailure({ error: error.message }))
+          )
+        )
+      )
+    )
+  );
+  pointsByUserId$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PointsActions.loadPointsByUserId),
+      mergeMap(({ userId }) =>
+        this.pointsService.getPointsByUserId(userId).pipe(
+          map((points) => PointsActions.loadPointsByUserIdSuccess({ points })),
+          catchError((error) =>
+            of(
+              PointsActions.loadPointsByUserIdFailure({ error: error.message })
+            )
           )
         )
       )
