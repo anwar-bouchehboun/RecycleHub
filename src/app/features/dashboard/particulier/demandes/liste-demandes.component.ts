@@ -24,148 +24,292 @@ import { BAREME_POINTS } from '../../../../models/points.model';
     MatChipsModule,
   ],
   template: `
-    <div class="container p-4 mx-auto">
-      <mat-card>
-        <mat-card-header>
-          <mat-card-title>Mes demandes de collecte</mat-card-title>
-        </mat-card-header>
-
-        <mat-card-content>
-          <div class="flex justify-end mb-4">
-            <button
-              mat-raised-button
-              color="primary"
-              (click)="nouvelleDemande()"
-              [disabled]="((demandesEnAttente$ | async) ?? []).length >= 3"
+    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div class="container p-4 mx-auto lg:p-8">
+        <mat-card
+          class="overflow-hidden rounded-xl border border-gray-100 shadow-lg"
+        >
+          <div
+            class="p-6 text-white bg-gradient-to-r from-blue-600 to-indigo-600"
+          >
+            <div
+              class="flex flex-col gap-4 justify-between items-center md:flex-row"
             >
-              <mat-icon>add</mat-icon>
-              Nouvelle demande
-            </button>
+              <h1 class="text-2xl font-bold">Mes demandes de collecte</h1>
+              <button
+                mat-raised-button
+                class="w-full transition-colors bg-white/20 hover:bg-white/30 md:w-auto"
+                (click)="nouvelleDemande()"
+                [disabled]="((demandesEnAttente$ | async) ?? []).length >= 3"
+              >
+                <mat-icon class="mr-2">add</mat-icon>
+                Nouvelle demande
+              </button>
+            </div>
           </div>
 
-          <table
-            mat-table
-            [dataSource]="(demandes$ | async) || []"
-            class="w-full"
-          >
-            <!-- Date Column -->
-            <ng-container matColumnDef="date">
-              <th mat-header-cell *matHeaderCellDef>Date</th>
-              <td mat-cell *matCellDef="let demande">
-                {{ demande.dateCollecte | date }}
-              </td>
-            </ng-container>
-
-            <!-- Types Column -->
-            <ng-container matColumnDef="types">
-              <th mat-header-cell *matHeaderCellDef>Types de déchets</th>
-              <td mat-cell *matCellDef="let demande">
-                <div class="flex gap-2">
-                  <div
-                    *ngFor="let type of demande.types"
-                    selected
-                    class="p-2 text-white bg-green-500 rounded-md"
-                  >
-                    {{ type.type }}
+          <div class="p-6">
+            <!-- Version mobile : Cards -->
+            <div class="block space-y-4 md:hidden">
+              <mat-card
+                *ngFor="let demande of demandes$ | async"
+                class="p-4 transition-shadow hover:shadow-md"
+              >
+                <div class="flex justify-between items-start mb-4">
+                  <div>
+                    <p class="text-sm text-gray-600">
+                      {{ demande.dateCollecte | date }}
+                    </p>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                      <div
+                        *ngFor="let type of demande.types"
+                        class="px-3 py-1 text-sm text-white bg-green-500 rounded-full"
+                      >
+                        {{ type.type }}
+                      </div>
+                    </div>
                   </div>
+                  <span [class]="getStatutClass(demande.statut)">
+                    {{ getStatutLabel(demande.statut) }}
+                  </span>
                 </div>
-              </td>
-            </ng-container>
 
-            <!-- Poids Column -->
-            <ng-container matColumnDef="poids">
-              <th mat-header-cell *matHeaderCellDef>Poids total</th>
-              <td mat-cell *matCellDef="let demande">
-                {{ demande.poidsTotal / 1000 }} kg
-              </td>
-            </ng-container>
-
-            <!-- Photos Column -->
-            <ng-container matColumnDef="photos">
-              <th mat-header-cell *matHeaderCellDef>Photos</th>
-              <td mat-cell *matCellDef="let demande">
-                <div class="flex gap-2">
-                  <div
-                    *ngIf="demande.photos && demande.photos.length > 0"
-                    class="relative"
-                  >
-                    <img
-                      [src]="demande.photos[0]"
-                      class="object-cover w-12 h-12 rounded"
-                      (click)="openPhotosDialog(demande.photos)"
-                    />
-                    <span
-                      *ngIf="demande.photos.length > 1"
-                      class="flex absolute -top-2 -right-2 justify-center items-center w-5 h-5 text-xs text-white rounded-full bg-primary-500"
+                <div class="flex justify-between items-center mt-4">
+                  <div class="flex gap-4 items-center">
+                    <div class="text-gray-600">
+                      <span class="font-medium">{{
+                        demande.poidsTotal / 1000
+                      }}</span>
+                      kg
+                    </div>
+                    <div
+                      *ngIf="demande.statut === 'validee'"
+                      class="font-medium text-green-600"
                     >
-                      +{{ demande.photos.length - 1 }}
-                    </span>
+                      {{ demande.pointsAttribues || calculerPoints(demande) }}
+                      points
+                    </div>
                   </div>
-                  <div *ngIf="!demande.photos?.length" class="text-gray-400">
-                    Aucune photo
+                  <div class="flex gap-2">
+                    <button
+                      mat-icon-button
+                      color="primary"
+                      (click)="modifierDemande(demande)"
+                      [disabled]="demande.statut !== 'en_attente'"
+                    >
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      color="warn"
+                      (click)="supprimerDemande(demande)"
+                      [disabled]="demande.statut !== 'en_attente'"
+                    >
+                      <mat-icon>delete</mat-icon>
+                    </button>
                   </div>
                 </div>
-              </td>
-            </ng-container>
+              </mat-card>
+            </div>
 
-            <!-- Statut Column -->
-            <ng-container matColumnDef="statut">
-              <th mat-header-cell *matHeaderCellDef>Statut</th>
-              <td mat-cell *matCellDef="let demande">
-                <span [class]="getStatutClass(demande.statut)">
-                  {{ getStatutLabel(demande.statut) }}
-                </span>
-              </td>
-            </ng-container>
+            <!-- Version desktop : Table -->
+            <div class="hidden overflow-x-auto md:block">
+              <table
+                mat-table
+                [dataSource]="(demandes$ | async) || []"
+                class="w-full"
+              >
+                <!-- Date Column -->
+                <ng-container matColumnDef="date">
+                  <th
+                    mat-header-cell
+                    *matHeaderCellDef
+                    class="font-semibold text-gray-700"
+                  >
+                    Date
+                  </th>
+                  <td mat-cell *matCellDef="let demande" class="py-4">
+                    {{ demande.dateCollecte | date }}
+                  </td>
+                </ng-container>
 
-            <!-- Points Column -->
-            <ng-container matColumnDef="points">
-              <th mat-header-cell *matHeaderCellDef>Points</th>
-              <td mat-cell *matCellDef="let demande">
-                <span
-                  *ngIf="demande.statut === 'validee'"
-                  class="font-bold text-green-600"
-                >
-                  {{ demande.pointsAttribues || calculerPoints(demande) }}
-                  points
-                </span>
-                <span *ngIf="demande.statut !== 'validee'" class="text-red-600">
-                  ######
-                </span>
-              </td>
-            </ng-container>
+                <!-- Types Column -->
+                <ng-container matColumnDef="types">
+                  <th
+                    mat-header-cell
+                    *matHeaderCellDef
+                    class="font-semibold text-gray-700"
+                  >
+                    Types de déchets
+                  </th>
+                  <td mat-cell *matCellDef="let demande" class="py-4">
+                    <div class="flex flex-wrap gap-2">
+                      <div
+                        *ngFor="let type of demande.types"
+                        class="px-3 py-1 text-sm text-white bg-green-500 rounded-full"
+                      >
+                        {{ type.type }}
+                      </div>
+                    </div>
+                  </td>
+                </ng-container>
 
-            <!-- Actions Column -->
-            <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef>Actions</th>
-              <td mat-cell *matCellDef="let demande">
-                <button
-                  mat-icon-button
-                  color="primary"
-                  (click)="modifierDemande(demande)"
-                  [disabled]="demande.statut !== 'en_attente'"
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  color="warn"
-                  (click)="supprimerDemande(demande)"
-                  [disabled]="demande.statut !== 'en_attente'"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </td>
-            </ng-container>
+                <!-- Poids Column -->
+                <ng-container matColumnDef="poids">
+                  <th
+                    mat-header-cell
+                    *matHeaderCellDef
+                    class="font-semibold text-gray-700"
+                  >
+                    Poids total
+                  </th>
+                  <td mat-cell *matCellDef="let demande" class="py-4">
+                    <span class="font-medium">{{
+                      demande.poidsTotal / 1000
+                    }}</span>
+                    kg
+                  </td>
+                </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-          </table>
-        </mat-card-content>
-      </mat-card>
+                <!-- Photos Column -->
+                <ng-container matColumnDef="photos">
+                  <th
+                    mat-header-cell
+                    *matHeaderCellDef
+                    class="font-semibold text-gray-700"
+                  >
+                    Photos
+                  </th>
+                  <td mat-cell *matCellDef="let demande" class="py-4">
+                    <div class="flex gap-2">
+                      <div
+                        *ngIf="demande.photos && demande.photos.length > 0"
+                        class="relative group"
+                      >
+                        <img
+                          [src]="demande.photos[0]"
+                          class="object-cover w-12 h-12 rounded-lg transition-transform cursor-pointer group-hover:scale-105"
+                          (click)="openPhotosDialog(demande.photos)"
+                        />
+                        <span
+                          *ngIf="demande.photos.length > 1"
+                          class="flex absolute -top-2 -right-2 justify-center items-center w-5 h-5 text-xs text-white bg-blue-500 rounded-full"
+                        >
+                          +{{ demande.photos.length - 1 }}
+                        </span>
+                      </div>
+                      <div
+                        *ngIf="!demande.photos?.length"
+                        class="text-gray-400"
+                      >
+                        Aucune photo
+                      </div>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Statut Column -->
+                <ng-container matColumnDef="statut">
+                  <th
+                    mat-header-cell
+                    *matHeaderCellDef
+                    class="font-semibold text-gray-700"
+                  >
+                    Statut
+                  </th>
+                  <td mat-cell *matCellDef="let demande" class="py-4">
+                    <span [class]="getStatutClass(demande.statut)">
+                      {{ getStatutLabel(demande.statut) }}
+                    </span>
+                  </td>
+                </ng-container>
+
+                <!-- Points Column -->
+                <ng-container matColumnDef="points">
+                  <th
+                    mat-header-cell
+                    *matHeaderCellDef
+                    class="font-semibold text-gray-700"
+                  >
+                    Points
+                  </th>
+                  <td mat-cell *matCellDef="let demande" class="py-4">
+                    <span
+                      *ngIf="demande.statut === 'validee'"
+                      class="font-medium text-green-600"
+                    >
+                      {{ demande.pointsAttribues || calculerPoints(demande) }}
+                      points
+                    </span>
+                    <span
+                      *ngIf="demande.statut === 'rejetee'"
+                      class="text-red-400"
+                    >
+                      Rejetée
+                    </span>
+                  </td>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                  <th
+                    mat-header-cell
+                    *matHeaderCellDef
+                    class="font-semibold text-gray-700"
+                  >
+                    Actions
+                  </th>
+                  <td mat-cell *matCellDef="let demande" class="py-4">
+                    <div class="flex gap-2">
+                      <button
+                        mat-icon-button
+                        color="primary"
+                        (click)="modifierDemande(demande)"
+                        [disabled]="demande.statut !== 'en_attente'"
+                        class="transition-colors hover:bg-blue-50"
+                      >
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button
+                        mat-icon-button
+                        color="warn"
+                        (click)="supprimerDemande(demande)"
+                        [disabled]="demande.statut !== 'en_attente'"
+                        class="transition-colors hover:bg-red-50"
+                      >
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <tr
+                  mat-header-row
+                  *matHeaderRowDef="displayedColumns"
+                  class="bg-gray-50"
+                ></tr>
+                <tr
+                  mat-row
+                  *matRowDef="let row; columns: displayedColumns"
+                  class="transition-colors hover:bg-gray-50"
+                ></tr>
+              </table>
+            </div>
+          </div>
+        </mat-card>
+      </div>
     </div>
   `,
-  styles: [],
+  styles: [
+    `
+      ::ng-deep .mat-mdc-table {
+        background: transparent !important;
+      }
+      ::ng-deep .mat-mdc-row:hover {
+        background-color: rgb(249 250 251) !important;
+      }
+    `,
+  ],
 })
 export class ListeDemandesComponent implements OnInit {
   demandes$ = this.store.select(DemandesSelectors.selectAllDemandes);

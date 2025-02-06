@@ -50,124 +50,97 @@ interface BonAchatDisponible extends BonAchat {
     MatSnackBarModule,
   ],
   template: `
-    <div class="container p-4 mx-auto">
-      <mat-card class="mb-4">
-        <mat-card-header>
-          <mat-card-title>Conversion de Points</mat-card-title>
+    <div class="p-4 min-h-screen bg-gray-50 lg:p-8">
+      <mat-card class="overflow-hidden mx-auto max-w-7xl rounded-xl shadow-lg">
+        <mat-card-header class="p-6 bg-primary-50">
+          <mat-card-title class="text-2xl font-bold text-primary-900"
+            >Conversion de Points</mat-card-title
+          >
         </mat-card-header>
-        <mat-card-content>
-          <div class="mt-4">
-            <div class="p-4 bg-blue-50 rounded-lg">
-              <h3 class="mb-2 text-lg font-semibold">Mes Points</h3>
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <p class="text-gray-600">Total des points gagnés:</p>
-                  <p class="text-2xl font-bold">
-                    {{ totalPointsGagnes$ | async }}
-                  </p>
-                </div>
-                <div>
-                  <p class="text-gray-600">Points disponibles:</p>
-                  <p class="text-2xl font-bold">
-                    {{ userPoints }}
-                  </p>
-                </div>
+
+        <mat-card-content class="p-6">
+          <!-- Section Points -->
+          <div
+            class="p-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-md"
+          >
+            <h3 class="mb-4 text-xl font-semibold text-white">Mes Points</h3>
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div class="p-4 rounded-lg backdrop-blur-sm bg-white/20">
+                <p class="text-blue-100">Total des points gagnés</p>
+                <p class="text-3xl font-bold text-white">
+                  {{ totalPointsGagnes$ | async }}
+                </p>
+              </div>
+              <div class="p-4 rounded-lg backdrop-blur-sm bg-white/20">
+                <p class="text-blue-100">Points disponibles</p>
+                <p class="text-3xl font-bold text-white">{{ userPoints }}</p>
               </div>
             </div>
+          </div>
 
-            <div class="mt-4">
-              <h3 class="mb-2 text-lg font-semibold">
-                Bons d'achat disponibles
-              </h3>
-              <div class="grid gap-4 md:grid-cols-3">
-                <div
-                  *ngFor="let bon of bonsDisponibles$ | async"
-                  class="p-4 rounded-lg border"
-                  [class.opacity-50]="!bon.disponible"
-                >
-                  <div class="flex justify-between items-center">
+          <!-- Section Bons d'achat -->
+          <div class="mt-8">
+            <h3 class="mb-4 text-xl font-semibold text-gray-800">
+              Bons d'achat disponibles
+            </h3>
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <div
+                *ngFor="let bon of bonsDisponibles$ | async"
+                class="bg-white rounded-xl shadow-md transition-all duration-300 hover:shadow-lg"
+                [class.opacity-50]="!bon.disponible"
+              >
+                <div class="p-6">
+                  <div class="flex flex-col justify-between h-full">
                     <div>
-                      <p class="text-xl font-bold">{{ bon.valeur }} Dh</p>
-                      <p class="text-sm text-gray-600">
+                      <p class="text-2xl font-bold text-primary-600">
+                        {{ bon.valeur }} Dh
+                      </p>
+                      <p class="mt-1 text-gray-600">
                         Pour {{ bon.points }} points
                       </p>
                     </div>
                     <button
                       mat-raised-button
                       color="primary"
+                      class="mt-4 w-full"
                       [disabled]="!bon.disponible"
                       (click)="convertirPoints(bon)"
                     >
-                      <mat-icon>swap_horiz</mat-icon>
+                      <mat-icon class="mr-2">swap_horiz</mat-icon>
                       Convertir
                     </button>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- <div class="mt-4" *ngIf="coupons$ | async as coupons">
-              <h3 class="mb-2 text-lg font-semibold">Mes Coupons</h3>
-              <div class="grid gap-4 md:grid-cols-2">
-                <div
-                  *ngFor="let coupon of coupons"
-                  class="p-4 rounded-lg border"
-                  [class.opacity-50]="coupon.estUtilise || isExpired(coupon)"
-                >
+          <!-- Section Historique -->
+          <div
+            class="mt-8"
+            *ngIf="historiqueConversions$ | async as historique"
+          >
+            <h3 class="mb-4 text-xl font-semibold text-gray-800">
+              Historique des conversions
+            </h3>
+            <div class="space-y-4">
+              <div
+                *ngFor="let operation of historique"
+                class="bg-white rounded-lg border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-md"
+                [ngClass]="{
+                  'border-l-4 border-l-green-500': operation.type === 'gain',
+                  'border-l-4 border-l-blue-500':
+                    operation.type === 'conversion'
+                }"
+              >
+                <div class="p-4">
                   <div class="flex justify-between items-center">
                     <div>
-                      <p class="text-xl font-bold">{{ coupon.valeur }} Dh</p>
-                      <p class="text-sm text-gray-600">
-                        Code: {{ coupon.code }}
-                      </p>
-                      <p class="text-xs text-gray-500">
-                        Expire le:
-                        {{ coupon.dateExpiration | date : 'dd/MM/yyyy' }}
-                      </p>
-                    </div>
-                    <div class="text-right">
-                      <span
-                        class="px-2 py-1 text-xs rounded"
-                        [class.bg-green-100.text-green-800]="
-                          !coupon.estUtilise && !isExpired(coupon)
-                        "
-                        [class.bg-red-100.text-red-800]="
-                          coupon.estUtilise || isExpired(coupon)
-                        "
-                      >
-                        {{ getStatus(coupon) }}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> -->
-
-            <div
-              class="mt-4"
-              *ngIf="historiqueConversions$ | async as historique"
-            >
-              <h3 class="mb-2 text-lg font-semibold">
-                Historique des conversions
-              </h3>
-              <div class="space-y-2">
-                <div
-                  *ngFor="let operation of historique"
-                  class="p-3 rounded-lg border"
-                  [ngClass]="{
-                    'bg-green-50': operation.type === 'gain',
-                    'bg-blue-50': operation.type === 'conversion'
-                  }"
-                >
-                  <div class="flex justify-between items-center">
-                    <div>
-                      <p class="font-medium">
+                      <p class="text-lg font-semibold">
                         {{ operation.type === 'gain' ? '+' : '-' }}
                         {{ operation.points }} points
                       </p>
-                      <p class="text-sm text-gray-600">
-                        {{ operation.details }}
-                      </p>
+                      <p class="text-gray-600">{{ operation.details }}</p>
                     </div>
                     <p class="text-sm text-gray-500">
                       {{ operation.date | date : 'dd/MM/yyyy HH:mm' }}
@@ -181,6 +154,21 @@ interface BonAchatDisponible extends BonAchat {
       </mat-card>
     </div>
   `,
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+
+      ::ng-deep .mat-mdc-card {
+        --mdc-elevated-card-container-color: transparent;
+      }
+
+      ::ng-deep .mat-mdc-card-header {
+        padding: 0;
+      }
+    `,
+  ],
 })
 export class ConversionPointsComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
