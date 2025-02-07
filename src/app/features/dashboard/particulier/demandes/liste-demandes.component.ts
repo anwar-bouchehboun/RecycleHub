@@ -12,6 +12,10 @@ import { Router } from '@angular/router';
 import * as DemandesActions from '../../../../store/demandes/demandes.actions';
 import * as DemandesSelectors from '../../../../store/demandes/demandes.selectors';
 import { BAREME_POINTS } from '../../../../models/points.model';
+import {
+  DateTimeFormatPipe,
+  DateFormatPipe,
+} from '../../../../pipes/date.pipe';
 @Component({
   selector: 'app-liste-demandes',
   standalone: true,
@@ -22,6 +26,8 @@ import { BAREME_POINTS } from '../../../../models/points.model';
     MatIconModule,
     MatTableModule,
     MatChipsModule,
+    DateTimeFormatPipe,
+    DateFormatPipe,
   ],
   template: `
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -58,7 +64,7 @@ import { BAREME_POINTS } from '../../../../models/points.model';
                 <div class="flex justify-between items-start mb-4">
                   <div>
                     <p class="text-sm text-gray-600">
-                      {{ demande.dateCollecte | date }}
+                      {{ demande.dateCollecte | dateTimeFormat }}
                     </p>
                     <div class="flex flex-wrap gap-2 mt-2">
                       <div
@@ -129,7 +135,7 @@ import { BAREME_POINTS } from '../../../../models/points.model';
                     Date
                   </th>
                   <td mat-cell *matCellDef="let demande" class="py-4">
-                    {{ demande.dateCollecte | date }}
+                    {{ demande.dateCollecte | dateFormat }}
                   </td>
                 </ng-container>
 
