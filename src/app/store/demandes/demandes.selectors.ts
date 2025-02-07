@@ -18,15 +18,24 @@ export const selectDemandesError = createSelector(
   selectDemandesState,
   (state) => state.error
 );
-export const selectDemandesByUser = (userId: number) =>
+
+export const selectDemandesByUser = (userId: number | undefined) =>
   createSelector(selectAllDemandes, (demandes) =>
-    demandes.filter((d) => d.userId === userId)
+    userId ? demandes.filter((d) => d.userId === userId) : []
   );
 
-export const selectDemandesEnAttenteByUser = (userId: number) =>
+export const selectCountDemandesByUser = (userId: number | undefined) =>
+  createSelector(selectDemandesByUser(userId), (demandes) => demandes.length);
+
+export const selectDemandesEnAttenteByUser = (userId: number | undefined) =>
   createSelector(selectAllDemandes, (demandes) =>
-    demandes.filter((d) => d.userId === userId && d.statut === 'en_attente')
+    userId ? demandes.filter((d) => d.userId === userId && d.statut === 'en_attente') : []
   );
+  export const selectDemandesEnCoursByUser = (userId: number |undefined) => createSelector(
+    selectAllDemandes,
+    (demandes) => demandes.filter(d => d.userId === userId && d.statut === 'en_cours')
+  );
+
 
 export const selectDemandesByVille = (ville: string) =>
   createSelector(selectAllDemandes, (demandes) =>

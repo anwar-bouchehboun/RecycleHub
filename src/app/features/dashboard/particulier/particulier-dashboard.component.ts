@@ -7,12 +7,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { Store } from '@ngrx/store';
 import { selectUser } from '../../../store/auth/auth.selectors';
 import * as PointsSelectors from '../../../store/points/points.selectors';
-import { takeUntil, map, filter, take, tap } from 'rxjs/operators';
+import { takeUntil, map, filter, take, tap, switchMap } from 'rxjs/operators';
 import { Subject, Observable } from 'rxjs';
 import * as DemandesActions from '../../../store/demandes/demandes.actions';
 import * as PointsActions from '../../../store/points/points.actions';
 import { User } from '../../../models/user.model';
 import { DashboardSectionComponent } from '../../../components/dashboard-section.component';
+import * as DemandesSelectors from '../../../store/demandes/demandes.selectors';
 
 @Component({
   selector: 'app-particulier-dashboard',
@@ -101,6 +102,42 @@ import { DashboardSectionComponent } from '../../../components/dashboard-section
                       </div>
                     </div>
                   </div>
+                  <!-- Demandes en cours -->
+                  <div
+                    class="flex-1 p-4 rounded-xl backdrop-blur transition-transform duration-300 transform sm:p-6 bg-white/10 hover:scale-105"
+                  >
+                    <div class="flex items-center space-x-4">
+                      <div class="p-2 rounded-lg sm:p-3 bg-white/20">
+                        <mat-icon class="text-white">schedule</mat-icon>
+                      </div>
+                      <div class="flex-1">
+                        <p class="text-sm font-medium text-white/70">
+                          Demandes en cours
+                        </p>
+                        <p class="text-base font-semibold sm:text-lg">
+                          {{ (countDemandesEnCours$ | async) }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Demandes en attente -->
+                  <div
+                    class="flex-1 p-4 rounded-xl backdrop-blur transition-transform duration-300 transform sm:p-6 bg-white/10 hover:scale-105"
+                  >
+                    <div class="flex items-center space-x-4">
+                      <div class="p-2 rounded-lg sm:p-3 bg-white/20">
+                        <mat-icon class="text-white">schedule</mat-icon>
+                      </div>
+                      <div class="flex-1">
+                        <p class="text-sm font-medium text-white/70">
+                          Demandes en attente
+                        </p>
+                        <p class="text-base font-semibold sm:text-lg">
+                          {{ (countDemandesEnAttente$ | async) }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -116,6 +153,8 @@ import { DashboardSectionComponent } from '../../../components/dashboard-section
               actionLabel="Voir mes demandes"
               routerLink="demandes"
               colorTheme="blue"
+              [showMetric]="true"
+              [metricValue]="(countDemandes$ | async) + ' demandes'"
               (action)="onDemandesClick()"
             ></app-dashboard-section>
 
@@ -140,16 +179,39 @@ import { DashboardSectionComponent } from '../../../components/dashboard-section
   `,
 })
 export class ParticulierDashboardComponent implements OnInit, OnDestroy {
-  user$: Observable<User | null>;
-  pointsDisponibles$: Observable<number>;
+  user$ = this.store.select(selectUser);
+  pointsDisponibles$ = this.store.select(PointsSelectors.selectPoints);
   pointsByUserId$ = this.store.select(PointsSelectors.selectPointsByUserId);
+  countDemandes$ = this.user$.pipe(
+    filter(
+      (user): user is User => user !== null && typeof user.id === 'number'
+    ),
+    switchMap((user) =>
+      this.store.select(DemandesSelectors.selectCountDemandesByUser(user.id))
+    )
+  );
+  countDemandesEnCours$ = this.user$.pipe(
+    filter(
+      (user): user is User => user !== null && typeof user.id === 'number'
+    ),
+    switchMap((user) =>
+      this.store.select(DemandesSelectors.selectDemandesEnCoursByUser(user.id))
+       .pipe(map((demandes) => demandes.length))
+    )
+  );
+  countDemandesEnAttente$ = this.user$.pipe(
+    filter(
+      (user): user is User => user !== null && typeof user.id === 'number'
+    ),
+    switchMap((user) =>
+      this.store.select(DemandesSelectors.selectDemandesEnAttenteByUser(user.id))
+       .pipe(map((demandes) => demandes.length))
+    )
+  );
   userPoints: number = 0;
   private destroy$ = new Subject<void>();
 
-  constructor(private store: Store) {
-    this.user$ = this.store.select(selectUser);
-    this.pointsDisponibles$ = this.store.select(PointsSelectors.selectPoints);
-  }
+  constructor(private store: Store) {}
 
   ngOnInit(): void {
     this.user$
