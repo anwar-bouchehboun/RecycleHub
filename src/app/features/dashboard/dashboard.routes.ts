@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard.component';
-import { CollecteurDashboardComponent } from './collecteur/collecteur-dashboard.component';
-import { ParticulierDashboardComponent } from './particulier/particulier-dashboard.component';
 import { ProfileComponent } from './profile/profile.component';
 import { AuthGuard } from '../../guards/auth.guard';
 import { ListeDemandesComponent } from './particulier/demandes/liste-demandes.component';
 import { DemandeFormComponent } from './particulier/demandes/demande-form.component';
 import { CollectesComponent } from './collecteur/collectes/collectes.component';
 import { roleGuard } from '../../guards/role.guard';
+import { collecteurResolver } from '../../resolvers/collecteur.resolver';
+import { particulierResolver } from '../../resolvers/particulier.resolver';
 
 export const DASHBOARD_ROUTES: Routes = [
   {
@@ -18,6 +18,7 @@ export const DASHBOARD_ROUTES: Routes = [
       {
         path: 'collecteur',
         canActivate: [roleGuard],
+        resolve: { isCollecteur: collecteurResolver },
         data: { role: 'collecteur' },
         children: [
           {
@@ -39,6 +40,7 @@ export const DASHBOARD_ROUTES: Routes = [
       {
         path: 'particulier',
         canActivate: [roleGuard],
+        resolve: { isParticulier: particulierResolver },
         data: { role: 'particulier' },
         children: [
           {

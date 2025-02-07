@@ -30,7 +30,7 @@ import * as DemandesSelectors from '../../../../store/demandes/demandes.selector
 import { User } from '../../../../models/user.model';
 import { DemandeCollecte } from '../../../../models/demande-collecte.model';
 import * as DemandesActions from '../../../../store/demandes/demandes.actions';
-import { DateTimeFormatPipe } from '../../../../pipes/date.pipe';
+import { DateFormatPipe, DateTimeFormatPipe } from '../../../../pipes/date.pipe';
 
 interface UserWithId extends User {
   id: number;
@@ -50,6 +50,7 @@ interface BonAchatDisponible extends BonAchat {
     MatIconModule,
     MatSnackBarModule,
     DateTimeFormatPipe,
+    DateFormatPipe,
   ],
   template: `
     <div class="p-4 min-h-screen bg-gray-50 lg:p-8">

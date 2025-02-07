@@ -12,10 +12,7 @@ import { Router } from '@angular/router';
 import * as DemandesActions from '../../../../store/demandes/demandes.actions';
 import * as DemandesSelectors from '../../../../store/demandes/demandes.selectors';
 import { BAREME_POINTS } from '../../../../models/points.model';
-import {
-  DateTimeFormatPipe,
-  DateFormatPipe,
-} from '../../../../pipes/date.pipe';
+import { DateTimeFormatPipe } from '../../../../pipes/date-time-format.pipe';
 @Component({
   selector: 'app-liste-demandes',
   standalone: true,
@@ -27,7 +24,6 @@ import {
     MatTableModule,
     MatChipsModule,
     DateTimeFormatPipe,
-    DateFormatPipe,
   ],
   template: `
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -135,7 +131,7 @@ import {
                     Date
                   </th>
                   <td mat-cell *matCellDef="let demande" class="py-4">
-                    {{ demande.dateCollecte | dateFormat }}
+                    {{ demande.dateCollecte | date }}
                   </td>
                 </ng-container>
 
@@ -354,6 +350,7 @@ export class ListeDemandesComponent implements OnInit {
   getStatutLabel(statut: string): string {
     const labels: { [key: string]: string } = {
       en_attente: 'En attente',
+      en_cours: 'En cours',
       validee: 'Validée',
       rejetee: 'Rejetée',
       terminee: 'Terminée',
@@ -364,6 +361,7 @@ export class ListeDemandesComponent implements OnInit {
   getStatutClass(statut: string): string {
     const classes: { [key: string]: string } = {
       en_attente: 'text-white  bg-yellow-400 p-2 rounded-md',
+      en_cours: 'text-white  bg-orange-400 p-2 rounded-md',
       validee: 'text-white  bg-green-400 p-2 rounded-md',
       rejetee: 'text-white  bg-red-400 p-2 rounded-md',
       terminee: 'text-white  bg-blue-400 p-2 rounded-md',
