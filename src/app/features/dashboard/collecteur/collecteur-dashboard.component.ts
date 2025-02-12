@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,6 +6,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
 import { Store } from '@ngrx/store';
 import { selectUser } from '../../../store/auth/auth.selectors';
+import { User } from '../../../models/user.model';
+import { Subject,Subscription, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-collecteur-dashboard',
@@ -59,10 +61,11 @@ import { selectUser } from '../../../store/auth/auth.selectors';
                               Nom Complet
                             </h3>
                             <p class="text-lg font-semibold text-gray-800">
-                              {{ (user$ | async)?.nom }}
-                              {{ (user$ | async)?.prenom }}
+                              {{ user.nom }}
+                              {{ user.prenom }}
                             </p>
                           </div>
+
                         </div>
                       </div>
                     </div>
@@ -88,10 +91,14 @@ import { selectUser } from '../../../store/auth/auth.selectors';
                             <p
                               class="text-lg font-semibold text-gray-800 break-all"
                             >
+                            <!-- Subscribe auto ans unsbscribe auto -->
                               {{ (user$ | async)?.email }}
+
                             </p>
                           </div>
                         </div>
+
+
                       </div>
                     </div>
 
@@ -116,11 +123,12 @@ import { selectUser } from '../../../store/auth/auth.selectors';
                               Zone
                             </h3>
                             <p class="text-lg font-semibold text-gray-800">
-                              {{ (user$ | async)?.adresse?.ville }}
+                              {{ user.adresse?.ville }}
                             </p>
                           </div>
                         </div>
                       </div>
+
                     </div>
                   </div>
                 </div>
@@ -132,10 +140,32 @@ import { selectUser } from '../../../store/auth/auth.selectors';
     </div>
   `,
 })
-export class CollecteurDashboardComponent implements OnInit {
+export class CollecteurDashboardComponent implements OnInit,OnDestroy {
   user$ = this.store.select(selectUser);
+  user: any;
+  private destroy$ = new Subject<void>();
+
 
   constructor(private store: Store) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+
+      this.user$.pipe(
+        //arrêter un Observable quand on quitte la page
+        takeUntil(this.destroy$)
+      ).subscribe((user) => {
+
+        console.log(user);
+        this.user = user;
+      });
+  }
+
+
+  ngOnDestroy(): void {
+    //arrêter un Observable quand on quitte la page
+        this.destroy$.next();
+        this.destroy$.complete();
+  }
+
+
 }

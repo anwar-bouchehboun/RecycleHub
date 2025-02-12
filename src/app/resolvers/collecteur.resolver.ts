@@ -5,6 +5,8 @@ import { delay, map, take } from 'rxjs/operators';
 import { selectUser } from '../store/auth/auth.selectors';
 
 export const collecteurResolver: ResolveFn<boolean> = () => {
+  //ne pas travail  Constructeur
+  //injecter le store et le router
   const store = inject(Store);
   const router = inject(Router);
 

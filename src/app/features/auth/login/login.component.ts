@@ -38,9 +38,14 @@ export class LoginComponent implements OnInit {
   error$ = this.store.select(AuthSelectors.selectAuthError);
 
   constructor(
+    // FormBuilder: permet de créer et gérer un formulaire
     private fb: FormBuilder,
+    // Store: permet de gérer le state de l'application
     private store: Store,
+    // Router: permet de naviguer entre les pages
     private router: Router
+
+
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -49,11 +54,12 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
-    // No need to call ngOnInit again, as loading$ and error$ are already initialized
   }
 
+  // onSubmit: permet de soumettre le formulaire
   onSubmit() {
     if (this.loginForm.valid) {
+
       const { email, password } = this.loginForm.value;
       this.store.dispatch(AuthActions.login({ email, password }));
     } else {

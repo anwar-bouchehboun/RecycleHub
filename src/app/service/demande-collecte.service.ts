@@ -89,6 +89,7 @@ export class DemandeCollecteService {
 
   updateDemande(
     id: number,
+    //partiel 
     updates: Partial<DemandeCollecte>
   ): Observable<DemandeCollecte> {
     const demandes = this.getAllDemandes();

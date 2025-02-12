@@ -12,6 +12,7 @@ import { DemandesEffects } from './store/demandes/demandes.effects';
 import { pointsReducer } from './store/points/points.reducer';
 import { PointsEffects } from './store/points/points.effects';
 
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),

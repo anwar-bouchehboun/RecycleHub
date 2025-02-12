@@ -187,20 +187,29 @@ export class PointsService {
     });
   }
 
+  // Ajouter des points à un utilisateur
+  // Observable: permet de gérer les événements asynchrones
+  // HistoriquePoints: type de données retourné
+  // pointsTotal: nombre de points total
+  // historique: historique des points
   ajouterPoints(
     userId: number,
     points: number,
+
     demandeId: number
+
   ): Observable<{ pointsTotal: number; historique: HistoriquePoints }> {
     console.log(`Ajout de ${points} points pour user:`, userId);
     const allPoints = this.getAllPoints();
     let userPoints = allPoints.find((p) => p.userId === userId);
 
+    // Si l'utilisateur n'existe pas, créer un nouvel objet PointsRecyclage
     if (!userPoints) {
       console.log('Création nouveau user points pour ajout:', userId);
       userPoints = this.initializeUserPoints(userId);
       allPoints.push(userPoints);
     }
+
 
     // Vérifier si les points n'ont pas déjà été ajoutés pour cette demande
     const dejaAjoute = userPoints.historique.some(
@@ -214,7 +223,7 @@ export class PointsService {
         historique: userPoints.historique[0],
       });
     }
-
+    // Créer un nouvel objet HistoriquePoints
     const historique: HistoriquePoints = {
       id: Date.now(),
       date: new Date(),
@@ -228,12 +237,15 @@ export class PointsService {
     this.savePoints(allPoints);
 
     console.log('Total des points après ajout:', userPoints.points);
+    // Retourner les points total et l'historique
     return of({
       pointsTotal: userPoints.points,
       historique,
     });
   }
-
+  // Récupérer les points d'un utilisateur
+  // Observable: permet de gérer les événements asynchrones
+  // PointsRecyclage: type de données retourné
   getPointsByUserId(userId: number): Observable<PointsRecyclage> {
     const allPoints = this.getAllPoints();
     const userPoints = allPoints.find((p) => p.userId === userId);

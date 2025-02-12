@@ -8,6 +8,9 @@ import * as DemandesActions from './demandes.actions';
 
 @Injectable()
 export class DemandesEffects {
+      //pipe: permet de chainer les opérations
+        //tap: permet de logguer les actions
+        //map: permet de transformer les données
   loadDemandes$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DemandesActions.loadDemandes),
@@ -40,9 +43,14 @@ export class DemandesEffects {
       ofType(DemandesActions.createDemande),
       tap((action) => console.log('Création demande - Action reçue:', action)),
       mergeMap(({ demande }) =>
+        //pipe: permet de chainer les opérations
+        //tap: permet de logguer les actions
+        //map: permet de transformer les données
         this.demandeService.createDemande(demande).pipe(
           tap((newDemande) => {
+            
             console.log('Création demande - Réponse du service:', newDemande);
+
           }),
           map((newDemande) => {
             console.log('Création demande - Success action:', newDemande);

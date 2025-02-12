@@ -104,50 +104,50 @@ class CalculateurPoints {
   ],
   template: `
     <div
-      class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6 lg:p-8"
+      class="p-4 min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 sm:p-6 lg:p-8"
     >
-      <div class="container max-w-7xl mx-auto space-y-6">
+      <div class="container mx-auto space-y-6 max-w-7xl">
         <!-- En-tête de la page -->
         <div
-          class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8"
+          class="flex flex-col gap-4 justify-between items-start mb-8 sm:flex-row sm:items-center"
         >
           <div>
             <h1
-              class="text-2xl sm:text-3xl font-bold text-gray-800 flex items-center gap-3"
+              class="flex gap-3 items-center text-2xl font-bold text-gray-800 sm:text-3xl"
             >
               <mat-icon class="text-primary">dashboard</mat-icon>
               Tableau de Bord Collecteur
             </h1>
-            <p class="text-gray-600 mt-2">
+            <p class="mt-2 text-gray-600">
               Gérez vos collectes et suivez vos performances
             </p>
           </div>
         </div>
 
         <!-- Cartes de statistiques -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
           <!-- Total Collectes -->
           <mat-card
-            class="transform hover:scale-105 transition-all duration-300 group"
+            class="transition-all duration-300 transform hover:scale-105 group"
           >
-            <mat-card-content class="relative overflow-hidden">
+            <mat-card-content class="overflow-hidden relative">
               <div class="p-6 bg-gradient-to-br from-blue-500 to-blue-600">
-                <div class="flex items-center justify-between text-white">
+                <div class="flex justify-between items-center text-white">
                   <div class="relative z-10">
-                    <div class="flex items-center gap-2">
+                    <div class="flex gap-2 items-center">
                       <mat-icon class="text-blue-200">recycling</mat-icon>
-                      <p class="text-blue-100 font-medium">Total Collectes</p>
+                      <p class="font-medium text-blue-100">Total Collectes</p>
                     </div>
-                    <h3 class="text-4xl font-bold mt-3 mb-1">
+                    <h3 class="mt-3 mb-1 text-4xl font-bold">
                       {{ totalCollectes$ | async }}
                     </h3>
-                    <div class="flex items-center gap-1 text-blue-200 text-sm">
+                    <div class="flex gap-1 items-center text-sm text-blue-200">
                       <mat-icon class="text-sm">calendar_today</mat-icon>
                       <span>Ce mois</span>
                     </div>
                   </div>
                   <div
-                    class="absolute right-0 bottom-0 opacity-10 transform translate-x-8 translate-y-8 group-hover:translate-x-6 group-hover:translate-y-6 transition-transform duration-300"
+                    class="absolute right-0 bottom-0 opacity-10 transition-transform duration-300 transform translate-x-8 translate-y-8 group-hover:translate-x-6 group-hover:translate-y-6"
                   >
                     <mat-icon class="text-[100px]">recycling</mat-icon>
                   </div>
@@ -158,28 +158,28 @@ class CalculateurPoints {
 
           <!-- Collectes Validées -->
           <mat-card
-            class="transform hover:scale-105 transition-all duration-300 group"
+            class="transition-all duration-300 transform hover:scale-105 group"
           >
-            <mat-card-content class="relative overflow-hidden">
+            <mat-card-content class="overflow-hidden relative">
               <div class="p-6 bg-gradient-to-br from-green-500 to-green-600">
-                <div class="flex items-center justify-between text-white">
+                <div class="flex justify-between items-center text-white">
                   <div class="relative z-10">
-                    <div class="flex items-center gap-2">
+                    <div class="flex gap-2 items-center">
                       <mat-icon class="text-green-200">check_circle</mat-icon>
-                      <p class="text-green-100 font-medium">
+                      <p class="font-medium text-green-100">
                         Collectes Validées
                       </p>
                     </div>
-                    <h3 class="text-4xl font-bold mt-3 mb-1">
+                    <h3 class="mt-3 mb-1 text-4xl font-bold">
                       {{ collectesValidees$ | async }}
                     </h3>
-                    <div class="flex items-center gap-1 text-green-200 text-sm">
+                    <div class="flex gap-1 items-center text-sm text-green-200">
                       <mat-icon class="text-sm">trending_up</mat-icon>
                       <span>Taux de succès</span>
                     </div>
                   </div>
                   <div
-                    class="absolute right-0 bottom-0 opacity-10 transform translate-x-8 translate-y-8 group-hover:translate-x-6 group-hover:translate-y-6 transition-transform duration-300"
+                    class="absolute right-0 bottom-0 opacity-10 transition-transform duration-300 transform translate-x-8 translate-y-8 group-hover:translate-x-6 group-hover:translate-y-6"
                   >
                     <mat-icon class="text-[100px]">check_circle</mat-icon>
                   </div>
@@ -190,26 +190,26 @@ class CalculateurPoints {
 
           <!-- En Attente -->
           <mat-card
-            class="transform hover:scale-105 transition-all duration-300 group"
+            class="transition-all duration-300 transform hover:scale-105 group"
           >
-            <mat-card-content class="relative overflow-hidden">
+            <mat-card-content class="overflow-hidden relative">
               <div class="p-6 bg-gradient-to-br from-amber-500 to-amber-600">
-                <div class="flex items-center justify-between text-white">
+                <div class="flex justify-between items-center text-white">
                   <div class="relative z-10">
-                    <div class="flex items-center gap-2">
+                    <div class="flex gap-2 items-center">
                       <mat-icon class="text-amber-200">pending</mat-icon>
-                      <p class="text-amber-100 font-medium">En Attente</p>
+                      <p class="font-medium text-amber-100">En Attente</p>
                     </div>
-                    <h3 class="text-4xl font-bold mt-3 mb-1">
+                    <h3 class="mt-3 mb-1 text-4xl font-bold">
                       {{ collectesEnAttente$ | async }}
                     </h3>
-                    <div class="flex items-center gap-1 text-amber-200 text-sm">
+                    <div class="flex gap-1 items-center text-sm text-amber-200">
                       <mat-icon class="text-sm">schedule</mat-icon>
                       <span>À traiter</span>
                     </div>
                   </div>
                   <div
-                    class="absolute right-0 bottom-0 opacity-10 transform translate-x-8 translate-y-8 group-hover:translate-x-6 group-hover:translate-y-6 transition-transform duration-300"
+                    class="absolute right-0 bottom-0 opacity-10 transition-transform duration-300 transform translate-x-8 translate-y-8 group-hover:translate-x-6 group-hover:translate-y-6"
                   >
                     <mat-icon class="text-[100px]">pending</mat-icon>
                   </div>
@@ -227,7 +227,7 @@ class CalculateurPoints {
           >
             <!-- En-tête de la demande -->
             <div
-              class="p-6 border-b relative"
+              class="relative p-6 border-b"
               [ngClass]="{
                 'bg-yellow-300 border-yellow-200':
                   demande.statut === 'en_attente',
@@ -237,11 +237,11 @@ class CalculateurPoints {
               }"
             >
               <div
-                class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+                class="flex flex-col gap-4 justify-between items-start sm:flex-row sm:items-center"
               >
-                <div class="flex items-center gap-4">
+                <div class="flex gap-4 items-center">
                   <div class="flex flex-col">
-                    <div class="flex items-center gap-3">
+                    <div class="flex gap-3 items-center">
                       <h3 class="text-xl font-bold text-gray-800">
                         Demande #{{ demande.id }}
                       </h3>
@@ -263,14 +263,14 @@ class CalculateurPoints {
                       </mat-chip-set>
                     </div>
                     <div
-                      class="flex items-center gap-2 text-sm text-gray-500 mt-1"
+                      class="flex gap-2 items-center mt-1 text-sm text-gray-500"
                     >
                       <mat-icon class="text-sm">event</mat-icon>
                       Créée le {{ demande.dateCreation | date : 'dd/MM/yyyy' }}
                     </div>
                   </div>
                 </div>
-                <div class="flex items-center gap-2 text-sm">
+                <div class="flex gap-2 items-center text-sm">
                   <mat-icon class="text-gray-400">schedule</mat-icon>
                   <span class="text-gray-600">
                     Collecte prévue:
@@ -282,11 +282,11 @@ class CalculateurPoints {
 
             <!-- Contenu de la demande -->
             <div class="p-6">
-              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <!-- Types de déchets -->
-                <div class="bg-gray-50 rounded-xl p-6">
+                <div class="p-6 bg-gray-50 rounded-xl">
                   <h4
-                    class="text-lg font-semibold text-gray-700 mb-4 flex items-center"
+                    class="flex items-center mb-4 text-lg font-semibold text-gray-700"
                   >
                     <mat-icon class="mr-2">recycling</mat-icon>
                     Types de déchets
@@ -294,9 +294,9 @@ class CalculateurPoints {
                   <div class="space-y-3">
                     <div
                       *ngFor="let type of demande.types"
-                      class="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
+                      class="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm transition-shadow duration-200 hover:shadow-md"
                     >
-                      <div class="flex items-center gap-3">
+                      <div class="flex gap-3 items-center">
                         <div
                           [ngClass]="{
                             'text-yellow-500': type.type === 'plastique',
@@ -325,7 +325,7 @@ class CalculateurPoints {
                         </div>
                       </div>
                       <div class="text-right">
-                        <p class="font-medium text-blue-600 text-lg">
+                        <p class="text-lg font-medium text-blue-600">
                           {{ calculateur.getPointsCalcules(demande.id, type) }}
                           pts
                         </p>
@@ -341,27 +341,27 @@ class CalculateurPoints {
                 <div class="space-y-6">
                   <!-- Résumé des points -->
                   <div
-                    class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6"
+                    class="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl"
                   >
                     <h4
-                      class="text-lg font-semibold text-blue-800 mb-4 flex items-center"
+                      class="flex items-center mb-4 text-lg font-semibold text-blue-800"
                     >
                       <mat-icon class="mr-2">emoji_events</mat-icon>
                       Points & Récompenses
                     </h4>
                     <div class="grid grid-cols-2 gap-4">
-                      <div class="bg-white p-4 rounded-xl shadow-sm">
+                      <div class="p-4 bg-white rounded-xl shadow-sm">
                         <p class="text-sm text-gray-600">Poids Total</p>
-                        <p class="text-2xl font-bold text-gray-800 mt-1">
+                        <p class="mt-1 text-2xl font-bold text-gray-800">
                           {{ calculateur.formatPoidsEnKg(demande.poidsTotal) }}
                           kg
                         </p>
                       </div>
                       <div
-                        class="bg-gradient-to-br from-blue-500 to-blue-600 p-4 rounded-xl shadow-sm"
+                        class="p-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-sm"
                       >
                         <p class="text-sm text-blue-100">Total Points</p>
-                        <p class="text-2xl font-bold text-white mt-1">
+                        <p class="mt-1 text-2xl font-bold text-white">
                           {{ calculateur.getTotalPoints(demande.id) }} pts
                         </p>
                       </div>
@@ -369,11 +369,11 @@ class CalculateurPoints {
                   </div>
 
                   <!-- Adresse et Créneau -->
-                  <div class="bg-gray-50 rounded-xl p-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div class="p-6 bg-gray-50 rounded-xl">
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                       <div>
                         <p
-                          class="text-sm font-medium text-gray-600 flex items-center mb-2"
+                          class="flex items-center mb-2 text-sm font-medium text-gray-600"
                         >
                           <mat-icon class="mr-2 text-gray-400"
                             >location_on</mat-icon
@@ -386,7 +386,7 @@ class CalculateurPoints {
                       </div>
                       <div>
                         <p
-                          class="text-sm font-medium text-gray-600 flex items-center mb-2"
+                          class="flex items-center mb-2 text-sm font-medium text-gray-600"
                         >
                           <mat-icon class="mr-2 text-gray-400"
                             >schedule</mat-icon
@@ -403,18 +403,18 @@ class CalculateurPoints {
               </div>
 
               <!-- Notes -->
-              <div *ngIf="demande.notes" class="mt-6 bg-gray-50 rounded-xl p-6">
+              <div *ngIf="demande.notes" class="p-6 mt-6 bg-gray-50 rounded-xl">
                 <p class="flex items-start text-gray-700">
                   <mat-icon class="mr-2 text-gray-400">notes</mat-icon>
                   <span>
-                    <span class="font-medium block mb-1">Notes:</span>
+                    <span class="block mb-1 font-medium">Notes:</span>
                     <span class="text-gray-600">{{ demande.notes }}</span>
                   </span>
                 </p>
               </div>
 
               <!-- Actions -->
-              <div class="mt-6 flex flex-wrap gap-4">
+              <div class="flex flex-wrap gap-4 mt-6">
                 <ng-container *ngIf="demande.statut === 'en_attente'">
                   <button
                     mat-raised-button
@@ -520,9 +520,11 @@ export class CollectesComponent implements OnInit {
 
   constructor(private store: Store, private dialog: MatDialog) {
     this.demandes$ = this.user$.pipe(
+      //SwitchMap pour les demandes en fonction de la ville de l'utilisateur
       switchMap((user) => {
         if (user?.adresse?.ville) {
           this.store.dispatch(
+
             DemandesActions.loadDemandesByVille({ ville: user.adresse.ville })
           );
           return this.store.select(
@@ -591,7 +593,7 @@ export class CollectesComponent implements OnInit {
   validerCollecte(demande: DemandeCollecte) {
     console.log('Validation collecte:', demande.id);
     const pointsTotal = this.calculateur.getTotalPoints(demande.id);
-
+    //Partiel pour ne pas modifier toutes les données de la demande
     const demandeModifiee: Partial<DemandeCollecte> = {
       statut: 'validee',
       dateMiseAJour: new Date(),

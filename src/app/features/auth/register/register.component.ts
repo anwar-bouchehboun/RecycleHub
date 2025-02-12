@@ -101,6 +101,7 @@ export class RegisterComponent implements OnInit {
   hidePassword = true; // Pour gérer la visibilité du mot de passe
   loading$ = this.store.select(AuthSelectors.selectAuthLoading);
   error$ = this.store.select(AuthSelectors.selectAuthError);
+  
 
   // Taille maximale du fichier (10MB)
   private readonly MAX_FILE_SIZE = 10 * 1024 * 1024;

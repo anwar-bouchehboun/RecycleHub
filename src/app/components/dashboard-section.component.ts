@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
 import { RouterModule } from '@angular/router';
-
+//Child of the dashboard section component
 @Component({
   selector: 'app-dashboard-section',
   standalone: true,
@@ -144,6 +144,7 @@ import { RouterModule } from '@angular/router';
   ],
 })
 export class DashboardSectionComponent {
+  
   @Input() title: string = '';
   @Input() description: string = '';
   @Input() icon: string = '';

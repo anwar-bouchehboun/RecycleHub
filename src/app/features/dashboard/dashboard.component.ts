@@ -35,6 +35,7 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private store: Store,
+    //Media query
     private breakpointObserver: BreakpointObserver
   ) {
     this.breakpointObserver

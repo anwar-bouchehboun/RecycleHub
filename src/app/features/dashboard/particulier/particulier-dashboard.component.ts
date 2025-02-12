@@ -14,7 +14,7 @@ import * as PointsActions from '../../../store/points/points.actions';
 import { User } from '../../../models/user.model';
 import { DashboardSectionComponent } from '../../../components/dashboard-section.component';
 import * as DemandesSelectors from '../../../store/demandes/demandes.selectors';
-
+  //Parent of the dashboard section component
 @Component({
   selector: 'app-particulier-dashboard',
   standalone: true,

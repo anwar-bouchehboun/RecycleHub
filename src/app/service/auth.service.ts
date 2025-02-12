@@ -11,6 +11,7 @@ interface LoginCredentials {
   providedIn: 'root',
 })
 export class AuthService {
+  //readonly: permet de définir une constante ne pas modifier
   private readonly USERS_KEY = 'users';
   private readonly CURRENT_USER_KEY = 'currentUser';
 
@@ -42,9 +43,11 @@ export class AuthService {
         u.email === credentials.email && u.password === credentials.password
     );
 
+    // Si l'utilisateur n'est pas trouvé, renvoyer une erreur
     if (!foundUser) {
       return of({ error: 'Email ou mot de passe incorrect' });
     }
+
 
     // Stocker l'utilisateur comme connecté uniquement lors de la connexion
     localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(foundUser));
